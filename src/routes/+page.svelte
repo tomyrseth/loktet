@@ -8,7 +8,7 @@
 
 <section>
 	<h1>
-		this is your trash app
+		this is your godlike app
 	</h1>
 </section>
 

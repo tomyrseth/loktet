@@ -7,10 +7,10 @@
 	<h1>About this app</h1>
 
 	<p>
-		Why are you even here
+		insane
 	</p>
 
 	<p>
-		The page you're looking at is ass
+		in the membrane
 	</p>
 </div>

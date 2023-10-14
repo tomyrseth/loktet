@@ -9,10 +9,6 @@
 	<main>
 		<slot />
 	</main>
-
-	<footer>
-		<p>go fuck yourself</p>
-	</footer>
 </div>
 
 <style>
