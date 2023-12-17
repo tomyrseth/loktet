@@ -1,5 +1,5 @@
 <svelte:head>
-	<title>About</title>
+	<title>Tom</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
 
@@ -7,10 +7,10 @@
 	<h1>About this app</h1>
 
 	<p>
-		insane
+		paragraph
 	</p>
 
 	<p>
-		in the membrane
+		p2
 	</p>
 </div>

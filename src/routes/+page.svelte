@@ -8,7 +8,7 @@
 
 <section>
 	<h1>
-		this is your godlike app
+		this is your app
 	</h1>
 </section>
 
