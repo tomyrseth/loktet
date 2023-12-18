@@ -8,7 +8,7 @@
 
 <section>
 	<h1>
-		this is your app
+		this is an app
 	</h1>
 </section>
 

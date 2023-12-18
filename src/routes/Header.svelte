@@ -13,10 +13,10 @@
 			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
 				<a href="/">Home</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
+			<li aria-current={$page.url.pathname === '/tom' ? 'page' : undefined}>
 				<a href="/about">Tom</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/about' ? 'page' : undefined}>
+			<li aria-current={$page.url.pathname === '/saab' ? 'page' : undefined}>
 				<a href="/about">Saab</a>
 			</li>
 		</ul>
