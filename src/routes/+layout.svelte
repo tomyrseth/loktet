@@ -8,6 +8,8 @@
 
 	<main>
 		<slot />
+
+		<h1>Test</h1>
 	</main>
 </div>
 

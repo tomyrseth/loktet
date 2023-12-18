@@ -6,11 +6,4 @@
 <div class="text-column">
 	<h1>Saab</h1>
 
-	<p>
-		paragraph
-	</p>
-
-	<p>
-		p2
-	</p>
 </div>

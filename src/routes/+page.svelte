@@ -8,7 +8,7 @@
 
 <section>
 	<h1>
-		this is an app
+		progressive web app
 	</h1>
 </section>
 
