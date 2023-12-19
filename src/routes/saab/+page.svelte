@@ -16,6 +16,6 @@
 
 <style>
 	h1 {
-		color:rgb(255, 118, 72);
+		color:rgb(255, 89, 33);
 	}
 </style>

@@ -23,5 +23,6 @@
 
 	h1 {
 		width: 100%;
+		color:rgb(255, 89, 33);
 	}
 </style>
