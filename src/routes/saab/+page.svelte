@@ -1,4 +1,5 @@
 <script>
+	import Calendar from "../../components/Calendar.svelte"
 </script>
 
 <svelte:head>
@@ -6,14 +7,9 @@
 	<meta name="description" content="About this app" />
 </svelte:head>
 
-<div class="text-column">
-	<h1>Saab</h1>
-
-
+<div class="main-container">
+	<Calendar/>
 </div>
 
 <style>
-	h1 {
-		color:rgb(255, 89, 33);
-	}
 </style>

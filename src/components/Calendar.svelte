@@ -1,127 +1,167 @@
 <script>
-	import calendarize from 'https://unpkg.com/calendarize?module';
-	import Arrow from './Arrow.svelte';
-	
-	export let year = 2024;
-	export let month = 0; // Jan
-	export let offset = 0; // Sun
-	export let today = null; // Date
-	
-	export let labels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-	export let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-	
-	$: today_month = today && today.getMonth();
-	$: today_year = today && today.getFullYear();
-	$: today_day = today && today.getDate();
-	
-	let prev = calendarize(new Date(year, month-1), offset);
-	let current = calendarize(new Date(year, month), offset);
-	let next = calendarize(new Date(year, month+1), offset);
-	
-	function toPrev() {
-		[current, next] = [prev, current];
-		
-		if (--month < 0) {
-			month = 11;
-			year--;
-		}
-		
-		prev = calendarize(new Date(year, month-1), offset);
-	}
-	
-	function toNext() {
-		[prev, current] = [current, next];
-		
-		if (++month > 11) {
-			month = 0;
-			year++;
-		}
-		
-		next = calendarize(new Date(year, month+1), offset);
-	}
-	
-	function isToday(day) {
-		return today && today_year === year && today_month === month && today_day === day;
-	}
+		let date = new Date();
+		let year = date.getFullYear();
+		let month = date.getMonth();
+    let day = date.getDay();
+    const months = [
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
+    ]
 </script>
+<div class="calendar-container">
+  <div class="calendar-header">
 
-<header>
-	<Arrow left on:click={toPrev} />
-	<h4>{months[month]} {year}</h4>
-	<Arrow on:click={toNext} />
-</header>
-
-<div class="month">
-	{#each labels as txt, idx (txt)}
-		<span class="label">{ labels[(idx + offset) % 7] }</span>
-	{/each}
-
-	{#each { length:6 } as w,idxw (idxw)}
-		{#if current[idxw]}
-			{#each { length:7 } as d,idxd (idxd)}
-				{#if current[idxw][idxd] != 0}
-					<span class="date" class:today={isToday(current[idxw][idxd])}>
-						{ current[idxw][idxd] }
-					</span>
-				{:else if (idxw < 1)}
-					<span class="date other">{ prev[prev.length - 1][idxd] }</span>
-				{:else}
-					<span class="date other">{ next[0][idxd] }</span>
-				{/if}
-			{/each}
-		{/if}
-	{/each}
+  </div>
+  <div class="calendar-body">
+    <ul class="calendar-weekdays">
+      <li>Sun</li>
+      <li>Mon</li>
+      <li>Tue</li>
+      <li>Wed</li>
+      <li>Thu</li>
+      <li>Fri</li>
+      <li>Sat</li>
+    </ul>
+    <ul class="calendar-dates">
+      {#each {length: 29} as day, i}
+        <li>{i + 1}</li>
+      {/each}
+    </ul>
+  </div>
 </div>
 
 <style>
-	header {
-		display: flex;
-		margin: 2rem auto;
-		align-items: center;
-		justify-content: center;
-		user-select: none;
-	}
-	
-	h4 {
-		display: block;
-		text-align: center;
-		text-transform: uppercase;
-		font-size: 140%;
-		margin: 0 1rem;
-	}
-	
-	.month {
-		display: grid;
-		grid-template-columns: repeat(7, 1fr);
-		text-align: right;
-		grid-gap: 4px;
-	}
-	
-	.label {
-		font-weight: 300;
-		text-align: center;
-		text-transform: uppercase;
-		margin-bottom: 0.5rem;
-		opacity: 0.6;
-	}
-	
-	.date {
-		height: 50px;
-		font-size: 16px;
-		letter-spacing: -1px;
-		border: 1px solid #e6e4e4;
-		padding-right: 4px;
-		font-weight: 700;
-		padding: 0.5rem;
-	}
-	
-	.date.today {
-		color: #5286fa;
-		background: #c4d9fd;
-		border-color: currentColor;
-	}
-	
-	.date.other {
-		opacity: 0.2;
-	}
+  h1 {
+    color: white;
+  }
+  * {
+	margin: 0;
+	padding: 0;
+	font-family: 'Poppins', sans-serif;
+}
+
+body {
+	display: flex;
+	background: #ef62da;
+	min-height: 100vh;
+	padding: 0 10px;
+	align-items: center;
+	justify-content: center;
+}
+
+.calendar-container {
+	background: #fff;
+	width: 450px;
+	border-radius: 10px;
+	box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+}
+
+.calendar-container header {
+	display: flex;
+	align-items: center;
+	padding: 25px 30px 10px;
+	justify-content: space-between;
+}
+
+header .calendar-navigation {
+	display: flex;
+}
+
+header .calendar-navigation span {
+	height: 38px;
+	width: 38px;
+	margin: 0 1px;
+	cursor: pointer;
+	text-align: center;
+	line-height: 38px;
+	border-radius: 50%;
+	user-select: none;
+	color: #aeabab;
+	font-size: 1.9rem;
+}
+
+.calendar-navigation span:last-child {
+	margin-right: -10px;
+}
+
+header .calendar-navigation span:hover {
+	background: #f2f2f2;
+}
+
+header .calendar-current-date {
+	font-weight: 500;
+	font-size: 1.45rem;
+}
+
+.calendar-body {
+	padding: 20px;
+}
+
+.calendar-body ul {
+	list-style: none;
+	flex-wrap: wrap;
+	display: flex;
+	text-align: center;
+}
+
+.calendar-body .calendar-dates {
+	margin-bottom: 20px;
+}
+
+.calendar-body li {
+	width: calc(100% / 7);
+	font-size: 1.07rem;
+	color: #414141;
+}
+
+.calendar-body .calendar-weekdays li {
+	cursor: default;
+	font-weight: 500;
+}
+
+.calendar-body .calendar-dates li {
+	margin-top: 30px;
+	position: relative;
+	z-index: 1;
+	cursor: pointer;
+}
+
+.calendar-dates li.inactive {
+	color: #aaa;
+}
+
+.calendar-dates li.active {
+	color: #fff;
+}
+
+.calendar-dates li::before {
+	position: absolute;
+	content: "";
+	z-index: -1;
+	top: 50%;
+	left: 50%;
+	width: 40px;
+	height: 40px;
+	border-radius: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.calendar-dates li.active::before {
+	background: #6332c5;
+}
+
+.calendar-dates li:not(.active):hover::before {
+	background: #e4e1e1;
+}
+
 </style>

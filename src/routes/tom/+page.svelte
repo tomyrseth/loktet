@@ -1,11 +1,18 @@
 <script>
-		import Calendar from './Calendar.svelte';
-	
-		const today = new Date;
 		let calendarOpen = false;
-		let dates = 0;
+		let statsOpen = false;
+
+		let date = new Date();
+		let year = date.getFullYear();
+		let month = date.getMonth();
+
+
 		function openCalendar() {
 			calendarOpen = !calendarOpen;
+		}
+
+		function openStats() {
+			statsOpen = !statsOpen;
 		}
 
 </script>
@@ -21,7 +28,7 @@
 			<button class="programs" on:click={openCalendar}>
 				Calendar
 			</button>
-			<button class="stats">
+			<button class="stats" on:click={openStats}>
 				Stats
 			</button>
 		</div>
@@ -31,6 +38,12 @@
 			{#each {length: 29} as date, i}
 				<button>{i+1}</button>
 			{/each}
+		</div>
+	{/if}
+
+	{#if statsOpen}
+		<div class="stats">
+			<h1 class="statsText">Stats go here</h1>
 		</div>
 	{/if}
 
@@ -50,6 +63,8 @@
 		width: 150px;
 		margin: 1px;
 		text-align: left;
+		color: var(--main-orange);
+		font-size: 20px;
 	}
 	button:hover {
 		border: solid white 2px;
@@ -72,5 +87,9 @@
 	.calendar {
 		display: flex;
 		flex-wrap: wrap;
+	}
+
+	.statsText {
+		color: var(--main-orange);
 	}
 </style>

@@ -14,6 +14,8 @@
 	--column-margin-top: 4rem;
 	font-family: var(--font-body);
 	color: var(--color-text);
+
+	--main-orange:	rgb(255, 89, 33);
 }
 
 body {
