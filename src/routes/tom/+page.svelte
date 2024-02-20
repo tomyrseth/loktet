@@ -1,10 +1,13 @@
 <script>
-		import Calendar from "../../components/Calendar.svelte";
-		let programsOpen = false;
-		let dates = 
-		function openPrograms() {
-			programsOpen = true;
+		import Calendar from './Calendar.svelte';
+	
+		const today = new Date;
+		let calendarOpen = false;
+		let dates = 0;
+		function openCalendar() {
+			calendarOpen = !calendarOpen;
 		}
+
 </script>
 
 <svelte:head>
@@ -12,22 +15,27 @@
 	<meta name="description" content="About this app" />
 </svelte:head>
 
-<div class="Menu">
-	<div class = "container">
-		<button class="programs" on:click={openPrograms}>
-			Programs
-		</button>
-		<button class="stats">
-			Stats		
-		</button>
+<div class="mainContainer">
+	<div class="Menu">
+		<div class = "container">
+			<button class="programs" on:click={openCalendar}>
+				Calendar
+			</button>
+			<button class="stats">
+				Stats
+			</button>
+		</div>
 	</div>
-
-	<div class="calendar">
+	{#if calendarOpen}
+		<div class="calendar">
 			{#each {length: 29} as date, i}
 				<button>{i+1}</button>
 			{/each}
-	</div>
+		</div>
+	{/if}
+
 </div>
+
 
 <style>
 	button {

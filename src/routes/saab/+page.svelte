@@ -1,5 +1,4 @@
 <script>
-	import Lifts from "../../components/Lifts.svelte"
 </script>
 
 <svelte:head>
@@ -10,7 +9,6 @@
 <div class="text-column">
 	<h1>Saab</h1>
 
-	<Lifts />
 
 </div>
 
