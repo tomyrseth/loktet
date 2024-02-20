@@ -1,33 +1,18 @@
 <script>
-	import { fade } from "svelte/transition";
 
-	let visible = false
-	function expand() {
-		visible = !visible
-	}
+	const upperLifts = ["Flat Bench", "Incline Bench", "OHP", "Pullup", "Weighted Pullup", "Tri iso", "Bicep iso", "Front/Side delt iso", "Rear delt iso"]
+	const lowerLifts = ["Squat", "Deadlift", "Quad iso", "Ham iso", "Calves"]
 
-	let tomSquat = 110;
-	let tomBench = 80;
-	let tomDL = 140;
-	let tomOHP = 60;
 </script>
 
-<div class = "container1">
-	<div class = container2>
-		<div on:click={expand}><p>Squat</p></div>
-		<div><p>Bench</p></div>
-		<div><p>Deadlift</p></div>
-		<div><p>Overhead Press</p></div>
-	</div>
+<div class = "container">
 
-	{#if visible}
-		<div class = "container3" transition:fade|global>
-			<div><p>{tomSquat} kg</p></div>
-			<div><p>{tomBench} kg</p></div>
-			<div><p>{tomDL} kg</p></div>
-			<div><p>{tomOHP} kg</p></div>
-		</div>
-	{/if}
+	<button class="programs">
+		Programs		
+	</button>
+	<button class="stats">
+		Stats		
+	</button>
 
 </div>
 
@@ -36,24 +21,36 @@
 		color: white;
 		
 	}
-
-	p:hover {
-		color: rgb(255, 118, 72);
-		cursor: pointer;
-		transition: color 0.2s linear;
+	button {
+		transition: .2s;
+		color:white;
+		background-color: rgb(80, 80, 80);
+		border: solid transparent 2px;
+		border-radius: 20px;
+		padding: 20px;
+	}
+	button:hover {
+		border: solid white 2px;
+	}
+	button:active {
+		background-color: rgb(31, 31, 31);
 	}
 
-	.container1 {
+	.programs {
 		display: flex;
-		border: 2px solid white;
-		border-radius: 30px;
-		background-color: rgb(57, 57, 57);
-		padding: 10px 30px 10px 30px;
+	}
+	.stats {
+		display: flex;
 	}
 
-	.container3 {
-		border-left: 2px solid white;
-		margin-left: 40px;
-		padding-left: 10px;
+
+
+	.container {
+		display: flex;
+		flex-direction: row;
+	}
+
+	.orange {
+		color: rgb(255, 89, 33);
 	}
 </style>
