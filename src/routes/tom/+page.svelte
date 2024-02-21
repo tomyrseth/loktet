@@ -1,10 +1,7 @@
 <script>
+		import Calendar from "../../components/Calendar.svelte"
 		let calendarOpen = false;
 		let statsOpen = false;
-
-		let date = new Date();
-		let year = date.getFullYear();
-		let month = date.getMonth();
 
 
 		function openCalendar() {
@@ -35,9 +32,7 @@
 	</div>
 	{#if calendarOpen}
 		<div class="calendar">
-			{#each {length: 29} as date, i}
-				<button>{i+1}</button>
-			{/each}
+			<Calendar/>
 		</div>
 	{/if}
 
@@ -58,11 +53,7 @@
 		background-color: rgb(80, 80, 80);
 		border: solid black 2px;
 		border-radius: 5px;
-
-		height: 150px;
-		width: 150px;
 		margin: 1px;
-		text-align: left;
 		color: var(--main-orange);
 		font-size: 20px;
 	}
