@@ -1,4 +1,5 @@
 <script>
+	export let data;
 </script>
 
 <svelte:head>
@@ -11,6 +12,14 @@
 		progressive web app
 	</h1>
 </section>
+
+<pre>
+	<code>{JSON.stringify(data, null, 2)}</code>
+</pre>
+
+<table>
+	
+</table>
 
 <style>
 	section {
