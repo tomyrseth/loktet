@@ -10,4 +10,8 @@ node_modules
 .output
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+<<<<<<< HEAD
 *db.*
+=======
+*db.*
+>>>>>>> 03b0026430f5ed41b57f48cbc80c870aa082a7f9
