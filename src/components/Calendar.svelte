@@ -1,167 +1,188 @@
+<!-- src/Calendar.svelte -->
 <script>
-		let date = new Date();
-		let year = date.getFullYear();
-		let month = date.getMonth();
-    let day = date.getDay();
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December"
-    ]
-</script>
-<div class="calendar-container">
-  <div class="calendar-header">
+  import { onMount } from 'svelte';
 
+  let now = new Date();
+  let currentDate = new Date();
+  let currentMonth = currentDate.getMonth();
+  let currentYear = currentDate.getFullYear();
+  let daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+  let firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+
+  $: monthName = currentDate.toLocaleString('default', { month: 'long' });
+  $: daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
+  $: emptyStartDays = Array.from({ length: firstDayOfMonth });
+
+  $: isToday = (day) => {
+    return day === now.getUTCDate() && currentMonth === now.getUTCMonth() && currentYear === now.getFullYear();
+  };
+
+  function navigateMonths(step) {
+    currentDate = new Date(currentYear, currentMonth + step, 1);
+    currentMonth = currentDate.getMonth();
+    currentYear = currentDate.getFullYear();
+    daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  }
+</script>
+
+<div class="calendar">
+
+  <div class="header">
+    <button on:click={() => navigateMonths(-1)} class="calendarNav">&lt;</button>
+    <span>{monthName} {currentYear}</span>
+    <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
   </div>
-  <div class="calendar-body">
-    <ul class="calendar-weekdays">
-      <li>Sun</li>
-      <li>Mon</li>
-      <li>Tue</li>
-      <li>Wed</li>
-      <li>Thu</li>
-      <li>Fri</li>
-      <li>Sat</li>
-    </ul>
-    <ul class="calendar-dates">
-      {#each {length: 29} as day, i}
-        <li>{i + 1}</li>
-      {/each}
-    </ul>
-  </div>
+  <div class="dayName">Sun</div>
+  <div class="dayName">Mon</div>
+  <div class="dayName">Tue</div>
+  <div class="dayName">Wed</div>
+  <div class="dayName">Thu</div>
+  <div class="dayName">Fri</div>
+  <div class="dayName">Sat</div>
+
+  {#each emptyStartDays as _, i}
+    <div class="dayContainer"></div>
+  {/each}
+  
+  {#each daysArray as day}
+    {#if isToday(day)}
+      <div class="currentDayContainer">
+        <button class="dayButton">{day}</button>
+        <button class="activityButtonTom">Tom: Upper</button>
+      </div>
+    {:else}
+      <div class="dayContainer">
+        <button class="dayButton">{day}</button>
+        <button class="activityButtonTom">Tom: Upper</button>
+        <button class="activityButtonSaab">Saab: Lower</button>
+      </div>
+    {/if}
+  {/each}
 </div>
 
 <style>
-  h1 {
+  .calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
     color: white;
   }
-  * {
-	margin: 0;
-	padding: 0;
-	font-family: 'Poppins', sans-serif;
-}
+  .header {
+    grid-column: span 7;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .currentDayContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: rgb(255, 89, 33);
+    height: 150px;
+    width: 180px;
+    padding: 0px;
+    border: solid 2px rgb(255, 89, 33);
+    background-color: rgb(26, 26, 26);
+    margin: 1px;
+    transition: 0.3s;
+  }
 
-body {
-	display: flex;
-	background: #ef62da;
-	min-height: 100vh;
-	padding: 0 10px;
-	align-items: center;
-	justify-content: center;
-}
+  .dayContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    color: rgb(255, 89, 33);
+    height: 150px;
+    width: 180px;
+    padding: 0px;
+    border: solid 2px transparent;
+    border-radius: 5px;
+    background-color: rgb(26, 26, 26);
+    margin: 1px;
+    transition: 0.3s;
+  }
 
-.calendar-container {
-	background: #fff;
-	width: 450px;
-	border-radius: 10px;
-	box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
-}
+  .currentDayContainer:hover , .dayContainer:hover {
+    background-color: rgba(26, 26, 26, 0.726);
+  }
 
-.calendar-container header {
-	display: flex;
-	align-items: center;
-	padding: 25px 30px 10px;
-	justify-content: space-between;
-}
+  .dayButton {
+    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: rgb(255, 89, 33);
+    margin: 0px;
+    width: 40px;
+    height: 30px;
+    background-color: transparent;
+    border: solid transparent 2px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: border 0.3s;
+  }
 
-header .calendar-navigation {
-	display: flex;
-}
+  .dayButton:hover {
+    border: solid rgb(255, 89, 33) 2px;
+    border-radius: 20px;
+  }
 
-header .calendar-navigation span {
-	height: 38px;
-	width: 38px;
-	margin: 0 1px;
-	cursor: pointer;
-	text-align: center;
-	line-height: 38px;
-	border-radius: 50%;
-	user-select: none;
-	color: #aeabab;
-	font-size: 1.9rem;
-}
+  .dayButton:active {
+    opacity: 0.5;
+  }
 
-.calendar-navigation span:last-child {
-	margin-right: -10px;
-}
+  .activityButtonTom {
+    display: flex;
+    background-color: transparent;
+    border: solid 1px rgb(255, 89, 33);
+    border-radius: 40px;
+    color: white;
+    transition: 0.5s;
+    padding: 5px;
+    margin: 3px;
+  }
 
-header .calendar-navigation span:hover {
-	background: #f2f2f2;
-}
+  .activityButtonSaab {
+    display: flex;
+    background-color: transparent;
+    border: solid 1px rgb(44, 255, 33);
+    border-radius: 40px;
+    color: white;
+    transition: 0.5s;
+    padding: 5px;
+    margin: 3px;
+  }
 
-header .calendar-current-date {
-	font-weight: 500;
-	font-size: 1.45rem;
-}
+  .activityButtonTom:hover, .activityButtonSaab:hover {
+    opacity: 0.8;
+    cursor: pointer
+  }
 
-.calendar-body {
-	padding: 20px;
-}
+  .activityButtonTom:active, .activityButtonSaab:active {
+    background-color: white;
+  }
 
-.calendar-body ul {
-	list-style: none;
-	flex-wrap: wrap;
-	display: flex;
-	text-align: center;
-}
+  .calendarNav:hover {
+    opacity: 0.8;
+  }
 
-.calendar-body .calendar-dates {
-	margin-bottom: 20px;
-}
+  .calendarNav {
+    font-size: 40px;
+    width: 100px;
+    background-color: rgb(26, 26, 26);
+    color: rgb(255, 89, 33);
+    border: transparent solid 2px;
+    transition: 0s;
+    margin-bottom: 20px;
+  }
 
-.calendar-body li {
-	width: calc(100% / 7);
-	font-size: 1.07rem;
-	color: #414141;
-}
-
-.calendar-body .calendar-weekdays li {
-	cursor: default;
-	font-weight: 500;
-}
-
-.calendar-body .calendar-dates li {
-	margin-top: 30px;
-	position: relative;
-	z-index: 1;
-	cursor: pointer;
-}
-
-.calendar-dates li.inactive {
-	color: #aaa;
-}
-
-.calendar-dates li.active {
-	color: #fff;
-}
-
-.calendar-dates li::before {
-	position: absolute;
-	content: "";
-	z-index: -1;
-	top: 50%;
-	left: 50%;
-	width: 40px;
-	height: 40px;
-	border-radius: 50%;
-	transform: translate(-50%, -50%);
-}
-
-.calendar-dates li.active::before {
-	background: #6332c5;
-}
-
-.calendar-dates li:not(.active):hover::before {
-	background: #e4e1e1;
-}
-
+  .calendarNav:active {
+    border: solid rgb(255, 89, 33) 2px;
+    border-radius: 4px;
+  }
 </style>
