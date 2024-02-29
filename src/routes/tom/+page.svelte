@@ -3,6 +3,9 @@
 		let calendarOpen = false;
 		let statsOpen = false;
 
+		export let data;
+		console.log(data);
+
 
 		function openCalendar() {
 			calendarOpen = !calendarOpen;

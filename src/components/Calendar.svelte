@@ -124,7 +124,7 @@
     border: solid transparent 2px;
     border-radius: 20px;
     cursor: pointer;
-    transition: border 0.3s;
+    transition: border 0.4s;
   }
 
   .dayButton:hover {
@@ -142,7 +142,7 @@
     border: solid 1px rgb(255, 89, 33);
     border-radius: 40px;
     color: white;
-    transition: 0.5s;
+    transition: 0s;
     padding: 5px;
     margin: 3px;
   }
@@ -153,18 +153,17 @@
     border: solid 1px rgb(44, 255, 33);
     border-radius: 40px;
     color: white;
-    transition: 0.5s;
+    transition: 0s;
     padding: 5px;
     margin: 3px;
   }
 
   .activityButtonTom:hover, .activityButtonSaab:hover {
-    opacity: 0.8;
     cursor: pointer
   }
 
   .activityButtonTom:active, .activityButtonSaab:active {
-    background-color: white;
+    opacity: 0.5;
   }
 
   .calendarNav:hover {
