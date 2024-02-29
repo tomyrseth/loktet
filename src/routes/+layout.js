@@ -5,17 +5,18 @@ export async function load() {
   const { data, error } = await supabase
     .from('users')
     .select(`
-      name,
-      programs (
-        program_name,
-        days (
-          day_name,
-          programExercises (
-            exercise_id,
-            sets,
-            reps,
-            weight,
-            notes
+      *,
+      program_templates (
+        *,
+        day_templates (
+          *,
+          workout_templates (
+              *,
+              exercises (
+                *
+              ),
+              workout_logs ( * )
+            )
           )
         )
       )

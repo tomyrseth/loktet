@@ -1,7 +1,6 @@
 <script>
 	export let data;
 	console.log(data);
-	
 </script>
 
 <svelte:head>
@@ -14,6 +13,9 @@
 		progressive web app
 	</h1>
 </section>
+
+<p>
+</p>
 
 <style>
 	section {
@@ -29,4 +31,8 @@
 		color:rgb(255, 89, 33);
 	}
 
+	p {
+	color: white;
+	font-size: 20px;
+ }
 </style>
