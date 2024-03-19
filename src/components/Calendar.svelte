@@ -1,5 +1,6 @@
 <!-- src/Calendar.svelte -->
 <script>
+  //<button class="activityButtonSaab">Saab: Lower</button>
   import { onMount } from 'svelte';
 
   let now = new Date();
@@ -49,13 +50,10 @@
     {#if isToday(day)}
       <div class="currentDayContainer">
         <button class="dayButton">{day}</button>
-        <button class="activityButtonTom">Tom: Upper</button>
       </div>
     {:else}
       <div class="dayContainer">
         <button class="dayButton">{day}</button>
-        <button class="activityButtonTom">Tom: Upper</button>
-        <button class="activityButtonSaab">Saab: Lower</button>
       </div>
     {/if}
   {/each}

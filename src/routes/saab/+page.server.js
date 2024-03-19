@@ -1,3 +1,4 @@
+/*
 import { supabase } from "$lib/supabaseClient";
 
 export async function load() {
@@ -6,8 +7,9 @@ export async function load() {
 
     .from('users')
     .select()
-    .eq('name', 'Tom');
+    .eq('name', 'Saab');
     return{
       data: data ?? [],
     };
 }
+*/
