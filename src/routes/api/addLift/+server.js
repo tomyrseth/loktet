@@ -7,12 +7,11 @@ export async function POST({ request }) {
   const userData = await request.json();
 
   const { data, error } = await supabase
-    .from('days')
+    .from('lifts')
     .insert([
-      {name: userData.day_name, uid: userData.uid, created_at: userData.currentClickedDay.date}
+      { day_id: userData.day_id, exercise_id: userData.ex_id, sets: userData.sets, reps: userData.reps, weight: userData.weight, notes: userData.notes, }
     ]);
 
   if (error) throw new Error(error.message);
   return new Response(String(data));
 }
-

@@ -1,34 +1,118 @@
-<!-- src/Calendar.svelte -->
-<script>
-  //<button class="activityButtonSaab">Saab: Lower</button>
+<script lang='ts'>
+  import Modal from '../components/Modal.svelte';
   import { onMount } from 'svelte';
+  import { goto } from '$app/navigation';
+
+  type daysTable = {
+    created_at: string,
+    id: number;
+    name: string;
+    uid: number;
+  }
+
+  export let data :daysTable[];
+
+  export let uid = 0;
+  
+  let showModal = false;
+  let trainingDaysArray = data;
+  let user_id = 0;
+  let day_name = '';
+  let currentClickedDay:object;
+
 
   let now = new Date();
+  let nowMonth = now.getMonth()+1; //+1 because start from 0
+
   let currentDate = new Date();
-  let currentMonth = currentDate.getMonth();
+  let currentMonth = currentDate.getMonth(); 
   let currentYear = currentDate.getFullYear();
   let daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   let firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
 
   $: monthName = currentDate.toLocaleString('default', { month: 'long' });
-  $: daysArray = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  $: emptyStartDays = Array.from({ length: firstDayOfMonth });
 
-  $: isToday = (day) => {
-    return day === now.getUTCDate() && currentMonth === now.getUTCMonth() && currentYear === now.getFullYear();
+  // Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
+  // Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
+  // This creates an array from all the days in the month, and assigns each day its full date, ex: '2024-01-01'.
+  $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
+      let trainingUser = '';
+      let trainingName = '';
+      let day_id = 0;
+      let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
+      let training = trainingDaysArray.find(training => training.created_at === date && training.uid === uid);
+      if (training){
+        trainingName = training.name;
+        day_id = training.id;
+        switch (training.uid) {
+          case 1:
+            trainingUser = 'Tom'
+            break;
+          case 2:
+            trainingUser = 'Saab'
+            break;
+          case 3:
+            trainingUser = 'TESTING'
+            break;
+          default:
+            console.log(`Sorry, we are out of ${training.uid}.`);
+        }
+      }
+      return {
+        date: date,
+        name: trainingUser,
+        hasTraining: !!training,
+        dayName: trainingName,
+        day_id : day_id,
+        user_id: uid,
+      }
+    });
+  
+  $: emptyStartDays = Array.from({ length: firstDayOfMonth });
+    
+  // Highlight today
+  $: isToday = (date:string) => {
+    return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDay().toString().length<2) ? now.getDay().toString().padStart(2, '0') : now.getDay().toString()));
   };
 
-  function navigateMonths(step) {
+
+  function navigateMonths(step:number) {
     currentDate = new Date(currentYear, currentMonth + step, 1);
     currentMonth = currentDate.getMonth();
     currentYear = currentDate.getFullYear();
     daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
   }
+
+  function openDayPage(day_id:number, user_id:number){
+    goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+  }
+
+  async function submitData() {
+
+    console.log(user_id, day_name,'POST DATA');
+    const response = await fetch('/api/addDay', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ uid, day_name , currentClickedDay})
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Submission successful', result);
+    } else {
+      console.error('Submission failed');
+    }
+  }
+
+  onMount(async () => {
+		console.log('DAYS ARRAY',daysArray);
+	});
+  
 </script>
 
-<div class="calendar">
 
+<div class="calendar">
   <div class="header">
     <button on:click={() => navigateMonths(-1)} class="calendarNav">&lt;</button>
     <span>{monthName} {currentYear}</span>
@@ -47,17 +131,31 @@
   {/each}
   
   {#each daysArray as day}
-    {#if isToday(day)}
-      <div class="currentDayContainer">
-        <button class="dayButton">{day}</button>
-      </div>
-    {:else}
-      <div class="dayContainer">
-        <button class="dayButton">{day}</button>
-      </div>
-    {/if}
+  <div class={isToday(day.date) ? 'currentDayContainer' : 'dayContainer'}>
+      <button class="dayButton">{day.date.slice(-2)}</button>
+      {#if day.hasTraining}
+        <button class = 'activityButton' on:click={() => openDayPage(day.day_id, day.user_id)}>
+          {day.name}
+          {day.dayName}
+        </button>
+      {:else}
+        <button class='plusButton' on:click={() => (showModal = true, currentClickedDay = day)}>+</button>
+      {/if}
+    </div>
   {/each}
 </div>
+
+<Modal bind:showModal>
+
+  <div class='modal'>
+    <h1>Day log</h1>
+
+    <label for="">Name your day</label>
+    <input type="text" bind:value={day_name}>
+
+    <button on:click="{submitData}">Submit</button>
+  </div>
+</Modal>
 
 <style>
   .calendar {
@@ -134,33 +232,42 @@
     opacity: 0.5;
   }
 
-  .activityButtonTom {
+  .activityButton {
     display: flex;
     background-color: transparent;
     border: solid 1px rgb(255, 89, 33);
     border-radius: 40px;
     color: white;
     transition: 0s;
-    padding: 5px;
+    padding: 10px;
     margin: 3px;
   }
 
-  .activityButtonSaab {
+  .plusButton {
     display: flex;
     background-color: transparent;
-    border: solid 1px rgb(44, 255, 33);
+    border: solid 1px rgba(255, 88, 33, 0.303);
     border-radius: 40px;
-    color: white;
+    color: rgba(255, 255, 255, 0.452);
     transition: 0s;
-    padding: 5px;
+    padding: 20px;
     margin: 3px;
   }
 
-  .activityButtonTom:hover, .activityButtonSaab:hover {
+  .plusButton:hover {
     cursor: pointer
   }
 
-  .activityButtonTom:active, .activityButtonSaab:active {
+  .modal {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .activityButton:hover {
+    cursor: pointer
+  }
+
+  .activityButton:active {
     opacity: 0.5;
   }
 

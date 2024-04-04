@@ -1,19 +1,12 @@
-<script>
-		import Calendar from "../../components/Calendar.svelte"
-		let calendarOpen = false;
-		let statsOpen = false;
-
-		export let data;
-		console.log(data);
+<script lang='ts'>
+	import Calendar from "../../components/Calendar.svelte"
+  import { type Database } from "$lib/types/supabase";
+	export let data:Database;
 
 
-		function openCalendar() {
-			calendarOpen = !calendarOpen;
-		}
+	const daysData = data.daysRes.data;
 
-		function openStats() {
-			statsOpen = !statsOpen;
-		}
+	const uid = 1; //Tom
 
 </script>
 
@@ -25,7 +18,7 @@
 <div class="mainContainer">
 	
 	<div class="calendar">
-			<Calendar/>
+			<Calendar data={daysData} {uid}/>
 	</div>
 </div>
 
