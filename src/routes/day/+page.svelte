@@ -176,11 +176,15 @@
 <style>
   .movement-container {
     display: flex;
+    flex-wrap: wrap;
   }
 
   .movement {
     display: flex;
     flex-direction: column;
+    flex-wrap: wrap;
+    text-wrap: wrap;
+    max-width: 200px;
     margin: 10px;
     border: solid rgba(255, 255, 255, 0.676) 1px;
     border-radius: 10px;
