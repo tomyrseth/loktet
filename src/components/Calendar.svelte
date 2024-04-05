@@ -249,7 +249,7 @@
     border: solid 1px rgba(255, 88, 33, 0.303);
     border-radius: 40px;
     color: rgba(255, 255, 255, 0.452);
-    transition: 0.2s;
+    transition: 0.3s;
     padding: 20px;
     margin: 3px;
   }
