@@ -236,9 +236,9 @@
     display: flex;
     background-color: transparent;
     border: solid 1px rgb(255, 89, 33);
-    border-radius: 40px;
+    border-radius: 5px;
     color: white;
-    transition: 0s;
+    transition: 0.5s;
     padding: 10px;
     margin: 3px;
   }
@@ -266,7 +266,10 @@
   }
 
   .activityButton:hover {
-    cursor: pointer
+    cursor: pointer;
+    color: black;
+    background-color: rgb(255, 89, 33);
+    border-radius: 25px;
   }
 
   .activityButton:active {
