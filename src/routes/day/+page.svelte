@@ -3,9 +3,14 @@
   import Modal from '../../components/Modal.svelte';
   import { onMount } from 'svelte';
 
-  type ex_table = {
+  type lifts = {
     id: number;
-    name: string;
+    day_id: number;
+    exercise_id: number;
+    notes: string;
+    reps: number;
+    sets: number;
+    weight: number;
   }
 
   const url = $page.url;
@@ -20,13 +25,20 @@
   let user_name = '';
   let ex_id = 0;
   let exerciseTable :object;
+  let exercise_id_list = [];
+  let arr = [];
 
-  
   export let data;
   
+  let liftsData :lifts[] = data.data;
   let exerciseData = data.exerciseRes.data;
   let daysData = data.daysRes.data;
   let currentDay = daysData.find(o => o.id.toString() === day_id);
+
+  for (let i = 0; i < liftsData.length; i++) {
+    arr.push(liftsData[i].exercise_id);
+    exercise_id_list = [...new Set(arr)];
+  }
 
   //Find exercise name based on id
   function findExName (id:number){
@@ -129,14 +141,20 @@
 
   <button class='plusButton' on:click={() => (showModal = true)}>+</button>
   <p>Current lifts today:</p>
-  <div class="movement-container">
-    {#each data.data as data}
-      <div class="movement">
-        <h2>{findExName(data.exercise_id)}</h2>
-        <p>Weight: {data.weight}kg</p>
-        <p>Sets: {data.sets}</p>
-        <p>Reps: {data.reps}</p>
-        <p>Notes: {data.notes}</p>
+  <div class="outer-movement-container">
+    {#each exercise_id_list as ex}
+      <div class="inner-movement-container">
+        <h2 class='ex-name'>{findExName(ex)}</h2>
+            {#each liftsData as lift}
+              {#if lift.exercise_id === ex}
+                <div class='movement'>
+                  <p>Weight: {lift.weight}</p>
+                  <p>Sets: {lift.sets}</p>
+                  <p>Reps: {lift.reps}</p>
+                  <p>Notes: {lift.notes}</p>
+                </div>
+              {/if}
+            {/each}
       </div>
     {/each}
   </div>
@@ -174,9 +192,21 @@
 
 
 <style>
-  .movement-container {
+  .outer-movement-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;
+    border-radius: 15px;
+  }
+
+  .inner-movement-container {
+    background-color: rgba(0, 0, 0, 0.472);
+    display: flex;
+    flex-direction: row;
+    border-radius: 15px;
+    border-bottom: solid rgb(255, 89, 33) 2px;
+    border-left: solid rgb(255, 89, 33) 2px;
+    padding: 0px;
+    margin: 0px 0px 5px 0px;
   }
 
   .movement {
@@ -184,20 +214,28 @@
     flex-direction: column;
     flex-wrap: wrap;
     text-wrap: wrap;
-    max-width: 200px;
-    margin: 10px;
-    border: solid rgba(255, 255, 255, 0.676) 1px;
-    border-radius: 10px;
-    padding: 20px;
-    background-color: rgba(0, 0, 0, 0.495);
+    margin: 5px 0px 5px 10px;
+    padding: 5px 20px 3px 20px;
+    border-radius: 12px;
+    border-right: dashed rgba(255, 255, 255, 0.574) 2px;
+  }
+
+  .ex-name {
+    font-weight: bold;
+    color: rgb(255, 89, 33);
+    width: 150px;
+    padding: 5px 0px 0px 5px;
+    margin: 0px 0px px 0px;
+    border-radius: 0px;
+    border-right: solid rgba(255, 255, 255, 0.455) 2px;
   }
 
   h1, p {
     color: white;
   }
-  h2 {
-    color: rgb(255, 89, 33);
-    font-size: 40;
+
+  p {
+    margin: 0px;
   }
 
   .modal {
