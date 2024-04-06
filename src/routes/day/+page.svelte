@@ -147,7 +147,9 @@
             {#each liftsData as lift}
               {#if lift.exercise_id === ex}
                 <div class='movement'>
-                  <p>Weight: {lift.weight}</p>
+                  {#if lift.weight !== 0}
+                    <p>Weight: {lift.weight}</p>
+                  {/if}
                   <p>Sets: {lift.sets}</p>
                   <p>Reps: {lift.reps}</p>
                   <p>Notes: {lift.notes}</p>
