@@ -259,4 +259,8 @@
     background-color: black;
 
   }
+
+  label {
+    color: white;
+  }
 </style>
