@@ -14,9 +14,6 @@
 	</h1>
 </section>
 
-<p>
-</p>
-
 <style>
 	section {
 		display: flex;

@@ -140,7 +140,6 @@
 
 
   <button class='plusButton' on:click={() => (showModal = true)}>+</button>
-  <p>Current lifts today:</p>
   <div class="outer-movement-container">
     {#each exercise_id_list as ex}
       <div class="inner-movement-container">
@@ -171,15 +170,15 @@
           <option>{exercise.name}</option>
         {/each}
       </datalist>
+
+      <label for="">Weight: </label>
+      <input type="text" bind:value={weight}>
   
       <label for="">Sets: </label>
       <input type="text" bind:value={sets}>
 
       <label for="">Reps: </label>
       <input type="text" bind:value={reps}>
-
-      <label for="">Weight: </label>
-      <input type="text" bind:value={weight}>
 
       <label for="">Notes: </label>
       <input type="text" bind:value={notes}>
