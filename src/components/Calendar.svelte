@@ -72,7 +72,7 @@
     
   // Highlight today
   $: isToday = (date:string) => {
-    return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDay().toString().length<2) ? now.getDay().toString().padStart(2, '0') : now.getDay().toString()));
+    return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDate().toString().length<2) ? now.getDate().toString().padStart(2, '0') : now.getDate().toString()));
   };
 
 

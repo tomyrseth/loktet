@@ -53,9 +53,7 @@
 
     //If exercise already exists
     if (ex_obj){
-      console.log('it exists', ex_obj);
       ex_id = ex_obj.id;
-      console.log(ex_id,'ex_id');
 
       const liftResponse = await fetch('/api/addLift', {
         method: 'POST',
@@ -136,7 +134,7 @@
 </script>
 
 <div>
-  <h1>Training log for {user_name} on {currentDay.created_at}</h1>
+  <h1>{user_name}'s workout, {currentDay.created_at}.</h1>
 
 
   <button class='plusButton' on:click={() => (showModal = true)}>+</button>
@@ -148,11 +146,17 @@
               {#if lift.exercise_id === ex}
                 <div class='movement'>
                   {#if lift.weight !== 0}
-                    <p>Weight: {lift.weight}</p>
+                    <p>Weight: <span style='color: rgb(255, 89, 33)'>{lift.weight}</span></p>
                   {/if}
-                  <p>Sets: {lift.sets}</p>
-                  <p>Reps: {lift.reps}</p>
-                  <p>Notes: {lift.notes}</p>
+                  <p>Sets: <span style='color: rgb(255, 89, 33)'>{lift.sets}</span></p>
+                  {#if lift.reps === 0}
+                    <p><span style='color: rgb(255, 0, 0)'>Reps: {lift.reps}</span></p>
+                  {:else}
+                    <p>Reps: <span style='color: rgb(255, 89, 33)'>{lift.reps}</span></p>
+                  {/if}
+                  {#if lift.notes !== ''}
+                    <p>Notes: <span style='color: rgb(120, 120, 120)'>{lift.notes}</span></p>
+                  {/if}
                 </div>
               {/if}
             {/each}
@@ -208,6 +212,7 @@
     border-left: solid rgb(255, 89, 33) 2px;
     padding: 0px;
     margin: 0px 0px 5px 0px;
+    color: rgb(255, 68, 68);
   }
 
   .movement {
