@@ -11,9 +11,8 @@
   }
 
   export let daysData :daysTable[];
-  console.log("🚀 ~ daysData:", daysData)
   export let bwData;
-  console.log("🚀 ~ bwData:", bwData)
+  export let caloriesData;
 
 
   export let uid = 0;
@@ -150,6 +149,12 @@
           <p class='bodyweight'>{bw.bodyweight} kg</p>
         {/if}
       {/each}
+
+    {#each caloriesData as cal}
+      {#if cal.created_at === day.date && cal.uid === uid}
+        <p class='bodyweight'>{cal.calories}</p>
+      {/if}
+    {/each}
       
 
 

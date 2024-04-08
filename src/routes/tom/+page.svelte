@@ -6,6 +6,7 @@
 
 	const daysData = data.daysRes.data;
 	const bwData = data.bwRes.data;
+	const caloriesData = data.caloriesRes.data;
 
 	const uid = 1; //Tom
 
@@ -19,7 +20,7 @@
 <div class="mainContainer">
 	
 	<div class="calendar">
-			<Calendar {daysData} {bwData} {uid}/>
+			<Calendar {daysData} {bwData} {caloriesData} {uid}/>
 	</div>
 </div>
 

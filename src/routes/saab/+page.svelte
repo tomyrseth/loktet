@@ -4,6 +4,7 @@
 
 	const daysData = data.daysRes.data;
 	const bwData = data.bwRes.data;
+	const caloriesData = data.caloriesRes.data;
   
 	const uid = 2; //SAAB
 
@@ -16,7 +17,7 @@
 
 <div class="main-container">
   <div class="calendar">
-    <Calendar {daysData} {bwData} {uid}/>
+    <Calendar {daysData} {bwData} {uid} {caloriesData}/>
   </div>
 </div>
 
