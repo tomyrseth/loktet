@@ -40,8 +40,36 @@ export async function load() {
     };
   }
 
+  const bwRes = await supabase
+  .from('bodyweight')
+  .select('');
+  const bwResErr = bwRes.error;
+
+  if (bwResErr) {
+    return {
+      status: 500,
+      body: {
+        error: `Error: ${bwResErr.message}`
+      }
+    };
+  }
+
+  const caloriesRes = await supabase
+  .from('calories')
+  .select('');
+  const caloriesResErr = caloriesRes.error;
+
+  if (caloriesResErr) {
+    return {
+      status: 500,
+      body: {
+        error: `Error: ${caloriesResErr.message}`
+      }
+    };
+  }
+
   return {
-    exerciseRes, daysRes, usersRes,
+    exerciseRes, daysRes, usersRes, bwRes, caloriesRes
   };
 }
 

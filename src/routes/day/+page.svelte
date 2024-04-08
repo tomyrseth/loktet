@@ -1,4 +1,5 @@
 <script lang='ts'>
+    import { browser } from '$app/environment';
   import { page } from '$app/stores';
   import Modal from '../../components/Modal.svelte';
   import { onMount } from 'svelte';
@@ -17,10 +18,11 @@
   const user_id = url.searchParams.get('user_id');
   const day_id = url.searchParams.get('day_id');
   let showModal = false;
+  let liftShow = false;
+  let bwShow = false;
+  let caloriesShow = false;
   let exerciseSelect: object;
-  let sets = 0;
-  let reps = 0;
-  let weight = 0;
+  let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
   let notes = '';
   let user_name = '';
   let ex_id = 0;
@@ -30,10 +32,13 @@
 
   export let data;
   
-  let liftsData :lifts[] = data.data;
-  let exerciseData = data.exerciseRes.data;
-  let daysData = data.daysRes.data;
+  let liftsData = data.data;
+  let exerciseData = data.exerciseRes?.data;
+  let daysData = data.daysRes?.data;
+  let bwData = data.bwRes?.data;
+  let caloriesData = data.caloriesRes?.data;
   let currentDay = daysData.find(o => o.id.toString() === day_id);
+  let today = currentDay.created_at;
 
   for (let i = 0; i < liftsData.length; i++) {
     arr.push(liftsData[i].exercise_id);
@@ -47,7 +52,7 @@
   }
 
   //Submit new lift today
-  async function submitData() {
+  async function submitLiftData() {
     //Finds correct row if exercise already exists
     let ex_obj = exerciseData.find(o => o.name === exerciseSelect);
 
@@ -105,9 +110,9 @@
 
         if (liftResponse.ok) {
           const result = await liftResponse.json();
-          console.log('Submission successful', result);
+          console.log('Lifts Submission successful', result);
         } else {
-          console.error('Submission failed');
+          console.error('Lifts Submission failed');
         }
       }
 
@@ -116,6 +121,40 @@
       }
     }
   }
+
+  async function submitBwData() {
+    console.log(bodyweight, 'POST DATA');
+    const response = await fetch('/api/addBw', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id, today, bodyweight})
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('BW Submission successful', result);
+    } else {
+      console.error('BW Submission failed');
+    }
+
+  }
+
+  async function submitCaloriesData() {
+    console.log(calories,'POST DATA');
+    const response = await fetch('/api/addCalories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id, calories , today, protein, carbs, fats })
+    });
+
+    if (response.ok) {
+      const result = await response.json();
+      console.log('Calories Submission successful', result);
+    } else {
+      console.error('Calories Submission failed');
+    }
+  }
+
 
   switch (user_id) {
           case '1':
@@ -133,11 +172,43 @@
 
 </script>
 
-<div>
+<div class='main'>
+
   <h1>{user_name}'s workout, {currentDay.created_at}.</h1>
+  <div class="above">
+
+    <div class="above-left">
+      <button class='plusButton' on:click={() => (showModal = true, liftShow = true, bwShow = false, caloriesShow = false)}>Add Lift</button>
+      <button class='plusButton' on:click={() => (showModal = true, liftShow = false, bwShow = true, caloriesShow = false)}>Add BW</button>
+      <button class='plusButton' on:click={() => (showModal = true, liftShow = false, bwShow = false, caloriesShow = true)}>Add Calories</button>
+    </div>
+
+    <div class="above-right">
+      {#each bwData as bw}
+        <!-- 
+          VERY SCUFFED USING ONLY == NOT ===
+        -->
+        {#if bw.created_at === today && bw.uid == user_id}
+          <p>{user_name}'s weight today is {bw.bodyweight}kg</p>
+        {/if}
+      {/each}
+
+      {#each caloriesData as cal}
+      <!-- 
+        VERY SCUFFED USING ONLY == NOT ===
+      -->
+      {#if cal.created_at === today && cal.uid == user_id}
+        <p>{user_name}'s calories today is {cal.calories}kcal, {cal.protein}g protein, {cal.carbs}g carbs and {cal.fats}g fats</p>
+      {/if}
+    {/each}
+    </div>
 
 
-  <button class='plusButton' on:click={() => (showModal = true)}>+</button>
+
+
+  </div>
+
+
   <div class="outer-movement-container">
     {#each exercise_id_list as ex}
       <div class="inner-movement-container">
@@ -165,33 +236,88 @@
   </div>
 
 
+
   <Modal bind:showModal>
+    {#if liftShow === true}
+      <div class='modal'>
+        <h1>Training log</h1>
+
+        <input bind:value={exerciseSelect} type="text" list='exercises' />
+        <datalist id='exercises'>
+          {#each exerciseData as exercise}
+            <option>{exercise.name}</option>
+          {/each}
+        </datalist>
+
+        <label for="">Weight: </label>
+        <input type="text" bind:value={weight}>
+    
+        <label for="">Sets: </label>
+        <input type="text" bind:value={sets}>
+
+        <label for="">Reps: </label>
+        <input type="text" bind:value={reps}>
+
+        <label for="">Notes: </label>
+        <input type="text" bind:value={notes}>
+    
+        <button on:click="{submitLiftData}">Submit</button>
+      </div>
+
+    {:else if bwShow === true}
+      <h1>Bodyweight log</h1>
+      <label for="">Bodyweight: </label>
+      <input type="text" bind:value={bodyweight}>
+      <button on:click="{submitBwData}">Submit</button>
+
+    {:else if caloriesShow === true}
+      <div class='modal'>
+        <h1>Calories log</h1>
+
+        <label for="">Calories: </label>
+        <input type="text" bind:value={calories}>
+
+        <label for="">Protein: </label>
+        <input type="text" bind:value={protein}>
+
+        <label for="">Carbs: </label>
+        <input type="text" bind:value={carbs}>
+
+        <label for="">Fats: </label>
+        <input type="text" bind:value={fats}>
+
+        <button on:click="{submitCaloriesData}">Submit</button>
+      </div>
+    {/if}
+
+  </Modal>
+
+  <!--
+
+  <Modal bind:showModal2>
 
     <div class='modal'>
-      <h1>Training log</h1>
-
-      <input bind:value={exerciseSelect} type="text" list='exercises' />
-      <datalist id='exercises'>
-        {#each exerciseData as exercise}
-          <option>{exercise.name}</option>
-        {/each}
-      </datalist>
+      <h1>Bodyweight log</h1>
 
       <label for="">Weight: </label>
-      <input type="text" bind:value={weight}>
-  
-      <label for="">Sets: </label>
-      <input type="text" bind:value={sets}>
-
-      <label for="">Reps: </label>
-      <input type="text" bind:value={reps}>
-
-      <label for="">Notes: </label>
-      <input type="text" bind:value={notes}>
-  
-      <button on:click="{submitData}">Submit</button>
+      <input type="text" bind:value={bodyweight}>
+      
+      <button on:click="{submitBwData}">Submit</button>
     </div>
   </Modal>
+
+  <Modal bind:showModal3>
+
+    <div class='modal'>
+      <h1>Calorie log</h1>
+
+      <label for="">Weight: </label>
+      <input type="text" bind:value={calories}>
+
+      <button on:click="{submitCalorieData}">Submit</button>
+    </div>
+  </Modal>
+  -->
 
 </div>
 
@@ -269,4 +395,16 @@
   label {
     color: white;
   }
+
+  .above {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+
+  .above-left {
+    display: flex;
+    flex-direction: row;
+  }
+
 </style>

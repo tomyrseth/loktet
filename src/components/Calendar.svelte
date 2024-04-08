@@ -99,9 +99,9 @@
 
     if (response.ok) {
       const result = await response.json();
-      console.log('Submission successful', result);
+      console.log('Day Submission successful', result);
     } else {
-      console.error('Submission failed');
+      console.error('Day Submission failed');
     }
   }
 
