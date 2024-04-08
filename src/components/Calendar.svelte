@@ -152,7 +152,7 @@
 
     {#each caloriesData as cal}
       {#if cal.created_at === day.date && cal.uid === uid}
-        <p class='bodyweight'>{cal.calories}</p>
+        <p class='bodyweight'>{cal.calories} kcal</p>
       {/if}
     {/each}
       
