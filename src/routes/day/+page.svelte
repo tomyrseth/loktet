@@ -189,7 +189,7 @@
           VERY SCUFFED USING ONLY == NOT ===
         -->
         {#if bw.created_at === today && bw.uid == user_id}
-          <p>{user_name}'s weight today is {bw.bodyweight}kg</p>
+          <p>{user_name}'s weight today is <span style='color: rgb(255, 89, 33)'>{bw.bodyweight}</span> kg</p>
         {/if}
       {/each}
 
@@ -198,7 +198,7 @@
         VERY SCUFFED USING ONLY == NOT ===
       -->
       {#if cal.created_at === today && cal.uid == user_id}
-        <p>{user_name}'s calories today is {cal.calories}kcal, {cal.protein}g protein, {cal.carbs}g carbs and {cal.fats}g fats</p>
+        <p>{user_name}'s calories today is <span style='color: rgb(255, 89, 33)'>{cal.calories}</span> kcal, {cal.protein}g protein, {cal.carbs}g carbs and {cal.fats}g fats</p>
       {/if}
     {/each}
     </div>
