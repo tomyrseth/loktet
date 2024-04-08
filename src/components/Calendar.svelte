@@ -10,12 +10,16 @@
     uid: number;
   }
 
-  export let data :daysTable[];
+  export let daysData :daysTable[];
+  console.log("🚀 ~ daysData:", daysData)
+  export let bwData;
+  console.log("🚀 ~ bwData:", bwData)
+
 
   export let uid = 0;
   
   let showModal = false;
-  let trainingDaysArray = data;
+  let trainingDaysArray = daysData;
   let user_id = 0;
   let day_name = '';
   let currentClickedDay:object;
@@ -140,6 +144,15 @@
       {:else}
         <button class='plusButton' on:click={() => (showModal = true, currentClickedDay = day)}>+</button>
       {/if}
+
+      {#each bwData as bw}
+        {#if bw.created_at === day.date && bw.uid === uid}
+          <p class='bodyweight'>{bw.bodyweight} kg</p>
+        {/if}
+      {/each}
+      
+
+
     </div>
   {/each}
 </div>
@@ -292,5 +305,9 @@
   .calendarNav:active {
     border: solid rgb(255, 89, 33) 2px;
     border-radius: 4px;
+  }
+
+  .bodyweight {
+    color: rgb(0, 211, 84);
   }
 </style>
