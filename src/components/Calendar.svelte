@@ -135,7 +135,6 @@
       <button class="dayButton">{day.date.slice(-2)}</button>
       {#if day.hasTraining}
         <button class = 'activityButton' on:click={() => openDayPage(day.day_id, day.user_id)}>
-          {day.name}
           {day.dayName}
         </button>
       {:else}
