@@ -2,7 +2,8 @@
 	import Calendar from "../../components/Calendar.svelte"
 	export let data;
 
-  const daysData = data.daysRes.data; 
+	const daysData = data.daysRes.data;
+	const bwData = data.bwRes.data;
   
 	const uid = 2; //SAAB
 
@@ -15,7 +16,7 @@
 
 <div class="main-container">
   <div class="calendar">
-    <Calendar data={daysData} {uid}/>
+    <Calendar {daysData} {bwData} {uid}/>
   </div>
 </div>
 
