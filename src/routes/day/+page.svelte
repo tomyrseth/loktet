@@ -40,6 +40,8 @@
   let currentDay = daysData.find(o => o.id.toString() === day_id);
   let today = currentDay.created_at;
 
+  console.log('Lifts Data: ', liftsData);
+
   for (let i = 0; i < liftsData.length; i++) {
     arr.push(liftsData[i].exercise_id);
     exercise_id_list = [...new Set(arr)];
