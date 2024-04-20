@@ -9,12 +9,12 @@
 	const caloriesData = data.caloriesRes.data;
 	const dietPlanData = data.dietPlanRes.data;
 
-	const uid = 1; //Tom
+	const uid = 3; //Caj
 
 </script>
 
 <svelte:head>
-	<title>Tom</title>
+	<title>Caj</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
 

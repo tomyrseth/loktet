@@ -13,6 +13,7 @@
   export let daysData :daysTable[];
   export let bwData;
   export let caloriesData;
+  export let dietPlanData;
 
 
   export let uid = 0;
@@ -23,7 +24,6 @@
   let day_name = '';
   let currentClickedDay:object;
 
-
   let now = new Date();
   let nowMonth = now.getMonth()+1; //+1 because start from 0
 
@@ -32,6 +32,7 @@
   let currentYear = currentDate.getFullYear();
   let daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
   let firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  $: adjustedFirstDayOfMonth = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
 
   $: monthName = currentDate.toLocaleString('default', { month: 'long' });
 
@@ -55,7 +56,7 @@
             trainingUser = 'Saab'
             break;
           case 3:
-            trainingUser = 'TESTING'
+            trainingUser = 'Caj'
             break;
           default:
             console.log(`Sorry, we are out of ${training.uid}.`);
@@ -71,7 +72,7 @@
       }
     });
   
-  $: emptyStartDays = Array.from({ length: firstDayOfMonth });
+  $: emptyStartDays = Array.from({ length: adjustedFirstDayOfMonth });
     
   // Highlight today
   $: isToday = (date:string) => {
@@ -89,6 +90,31 @@
 
   function openDayPage(day_id:number, user_id:number){
     goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+  }
+
+  function isSunday(date) {
+    let temp = new Date(date);
+    return temp.getDay() === 0;
+  }
+
+  function isDateInCurrentOrFuture(dpd, day){
+    const dataDate = new Date(dpd.created_at);
+    const dataYear = dataDate.getFullYear();
+    const dataMonth = dataDate.getMonth();
+    const dataDay = dataDate.getDate();
+
+    const dayDate = new Date(day.date);
+    const dayYear = dayDate.getFullYear();
+    const dayMonth = dayDate.getMonth();
+    const dayDay = dayDate.getDate();
+
+
+    if (dayYear < dataYear) return false;
+    if (dataYear === dayYear) {
+      if (dayMonth < dataMonth) return false;
+      if (dataMonth === dayMonth && dayDay > dataDay) return false;
+    }
+    return true;
   }
 
   async function submitData() {
@@ -121,13 +147,13 @@
     <span>{monthName} {currentYear}</span>
     <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
   </div>
-  <div class="dayName">Sun</div>
   <div class="dayName">Mon</div>
   <div class="dayName">Tue</div>
   <div class="dayName">Wed</div>
   <div class="dayName">Thu</div>
   <div class="dayName">Fri</div>
   <div class="dayName">Sat</div>
+  <div class="dayName">Sun</div>
 
   {#each emptyStartDays as _, i}
     <div class="dayContainer"></div>
@@ -135,26 +161,34 @@
   
   {#each daysArray as day}
   <div class={isToday(day.date) ? 'currentDayContainer' : 'dayContainer'}>
-      <button class="dayButton">{day.date.slice(-2)}</button>
-      {#if day.hasTraining}
-        <button class = 'activityButton' on:click={() => openDayPage(day.day_id, day.user_id)}>
-          {day.dayName}
-        </button>
-      {:else}
-        <button class='plusButton' on:click={() => (showModal = true, currentClickedDay = day)}>+</button>
-      {/if}
+    <button class="dayButton">{day.date.slice(-2)}</button>
+    {#if day.hasTraining}
+      <button class = 'activityButton' on:click={() => openDayPage(day.day_id, day.user_id)}>
+        {day.dayName}
+      </button>
+    {:else}
+      <button class='plusButton' on:click={() => (showModal = true, currentClickedDay = day)}>+</button>
+    {/if}
 
-      {#each bwData as bw}
-        {#if bw.created_at === day.date && bw.uid === uid}
-          <p class='bodyweight'>{bw.bodyweight} kg</p>
-        {/if}
-      {/each}
+    {#each bwData as bw}
+      {#if bw.created_at === day.date && bw.uid === uid}
+        <p class='bodyweight'>{bw.bodyweight} kg</p>
+      {/if}
+    {/each}
 
     {#each caloriesData as cal}
       {#if cal.created_at === day.date && cal.uid === uid}
         <p class='bodyweight'>{cal.calories} kcal</p>
       {/if}
     {/each}
+
+    {#each dietPlanData as dpd}
+      {#if dpd.uid === uid && isDateInCurrentOrFuture(dpd, day) && isSunday(day.date)}
+        <p class='bodyweight'>{dpd.type}</p>
+        <p class='bodyweight'>{dpd.amount}</p>
+      {/if}
+    {/each}
+
       
 
 
@@ -175,6 +209,10 @@
 </Modal>
 
 <style>
+  p {
+    margin: 0;
+  }
+
   .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);

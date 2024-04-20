@@ -68,8 +68,20 @@ export async function load() {
     };
   }
 
+  const dietPlanRes = await supabase.from('diet_plan').select();
+  const dietPlanErr = dietPlanRes.error;
+
+  if (dietPlanErr) {
+    return {
+      status: 500,
+      body: {
+        error: `Error: ${dietPlanErr.message}`
+      }
+    };
+  }
+
   return {
-    exerciseRes, daysRes, usersRes, bwRes, caloriesRes
+    exerciseRes, daysRes, usersRes, bwRes, caloriesRes, dietPlanRes
   };
 }
 

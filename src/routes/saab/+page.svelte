@@ -7,12 +7,11 @@
 	let calorieGoal = 0;
 	let cbm = '';
 
-	$: console.log("🚀 ~ cbm:", cbm)
-
 	let plan = ['Cutting', 'Bulking', 'Maintenance']
 	const daysData = data.daysRes.data;
 	const bwData = data.bwRes.data;
 	const caloriesData = data.caloriesRes.data;
+	const dietPlanData = data.dietPlanRes.data;
   
 	const uid = 2; //SAAB
 
@@ -41,7 +40,7 @@
 <button on:click={() => (showModal = true)}>Add Diet Plan</button>
 <div class="main-container">
   <div class="calendar">
-    <Calendar {daysData} {bwData} {uid} {caloriesData}/>
+    <Calendar {daysData} {bwData} {uid} {caloriesData} {dietPlanData}/>
   </div>
 
 	<Modal bind:showModal>
