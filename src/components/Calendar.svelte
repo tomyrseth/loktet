@@ -148,7 +148,6 @@
         Object.assign(item, additionalDataMap.get(key));
       }
     });
-    console.log('MAGIC: ', caloriesData);
   }
   addRecapToCalories();
 
@@ -179,6 +178,9 @@
     //get all the dates from caloriesData(supabase) that match the 7 days
     const filteredUID = caloriesData.filter(item => item.uid === uid);
     const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at));
+    if(matchingDates.length < 7){
+      return 0;
+    }
     
     //extract calories, protein, carbs, fats from them
     for (let i = 0; i < matchingDates.length; i++) {
@@ -276,15 +278,15 @@
             {#if cal.calorieTot}
               {#each dietPlanData as dpd}
                 {#if dpd.uid === uid && isDateInCurrentOrFuture(dpd, day) && isSunday(day.date)}
-                <div class='recap-text'>
-                  <p class='bodyweight'>{dpd.type}</p>
-                  <p class='bodyweight'>{cal.calorieTot} / {dpd.amount} kcal</p>
-                </div>
+                    <div class='recap-text'>
+                      <p class='bodyweight'>{dpd.type}</p>
+                      <p class='bodyweight'>{cal.calorieTot} / {dpd.amount} kcal</p>
+                    </div>
+                    <div class='bodyweight'> {Math.trunc(cal.calorieTot/7)} / {Math.trunc(dpd.amount/7)} kcal</div>
+                    <div class='recap-text'> <p> P: {cal.proteinTot} / {Math.trunc(cal.proteinTot/7)}  g</p> </div>
+                    <div class='recap-text'> <p>C: {cal.carbsTot} / {Math.trunc(cal.carbsTot/7)}  g</p> </div>
+                    <div class='recap-text'> <p>F: {cal.fatsTot} / {Math.trunc(cal.fatsTot/7)}  g</p> </div>
                 {/if}
-                <div class='bodyweight'> {Math.trunc(cal.calorieTot/7)} / {Math.trunc(dpd.amount/7)} kcal</div>
-                <div class='recap-text'> <p> P: {cal.proteinTot} / {Math.trunc(cal.proteinTot/7)}  g</p> </div>
-                <div class='recap-text'> <p>C: {cal.carbsTot} / {Math.trunc(cal.carbsTot/7)}  g</p> </div>
-                <div class='recap-text'> <p>F: {cal.fatsTot} / {Math.trunc(cal.fatsTot/7)}  g</p> </div>
               {/each}
 
             {/if}
