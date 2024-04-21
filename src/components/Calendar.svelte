@@ -3,6 +3,7 @@
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
 
+
   type daysTable = {
     created_at: string,
     id: number;
@@ -15,13 +16,10 @@
   export let caloriesData;
   export let dietPlanData;
 
-  console.log(caloriesData);
-
 
   export let uid = 0;
   
   let showModal = false;
-  let trainingDaysArray = daysData;
   let user_id = 0;
   let day_name = '';
   let currentClickedDay:object;
@@ -37,42 +35,6 @@
   $: adjustedFirstDayOfMonth = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
 
   $: monthName = currentDate.toLocaleString('default', { month: 'long' });
-
-  // Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
-  // Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
-  // This creates an array from all the days in the month, and assigns each day its full date, ex: '2024-01-01'.
-  $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
-      let trainingUser = '';
-      let trainingName = '';
-      let day_id = 0;
-      let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
-      let training = trainingDaysArray.find(training => training.created_at === date && training.uid === uid);
-      if (training){
-        trainingName = training.name;
-        day_id = training.id;
-        switch (training.uid) {
-          case 1:
-            trainingUser = 'Tom'
-            break;
-          case 2:
-            trainingUser = 'Saab'
-            break;
-          case 3:
-            trainingUser = 'Caj'
-            break;
-          default:
-            console.log(`Sorry, we are out of ${training.uid}.`);
-        }
-      }
-      return {
-        date: date,
-        name: trainingUser,
-        hasTraining: !!training,
-        dayName: trainingName,
-        day_id : day_id,
-        user_id: uid,
-      }
-    });
   
   $: emptyStartDays = Array.from({ length: adjustedFirstDayOfMonth });
     
@@ -151,6 +113,86 @@
   }
   addRecapToCalories();
 
+  // Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
+  // Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
+  // This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
+  $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
+    let trainingUser = '', trainingName = ''
+    let day_id = 0;
+    let calories = undefined, protein = undefined, carbs = undefined, fats = undefined, bw = undefined, calorieTot = undefined, proteinTot = undefined, carbsTot = undefined, fatsTot = undefined, type = undefined, amount = undefined;
+
+
+    let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
+
+    let trainingArr = daysData.find(item => item.created_at === date && item.uid === uid);
+    let caloriesArr = caloriesData.find(item => item.created_at === date && item.uid === uid);
+    let bwArr = bwData.find(item => item.created_at === date && item.uid === uid);
+    let dietPlanArr = dietPlanData.filter(item => item.uid === uid);
+
+    if (caloriesArr){
+      calories = caloriesArr.calories;
+      protein = caloriesArr.protein;
+      carbs = caloriesArr.carbs;
+      fats = caloriesArr.fats;
+      calorieTot = caloriesArr.calorieTot;
+      proteinTot = caloriesArr.proteinTot;
+      carbsTot = caloriesArr.carbsTot;
+      fatsTot = caloriesArr.fatsTot;
+    }
+    if (bwArr){
+      bw = bwArr.bodyweight;
+    }
+    if (dietPlanArr){
+      // Step 1: Sort objects by id in descending order
+      dietPlanArr.sort((a, b) => b.id - a.id);
+      // Step 3: Find the first upcoming date
+      const result = dietPlanArr.find(item => new Date(item.created_at) < new Date(date));
+      // Handle the case where no future date is found
+      if (result){
+        type = result.type;
+        amount = result.amount;
+      }
+
+    }
+      
+    if (trainingArr){
+      trainingName = trainingArr.name;
+      day_id = trainingArr.id;
+      switch (trainingArr.uid) {
+        case 1:
+          trainingUser = 'Tom'
+          break;
+        case 2:
+          trainingUser = 'Saab'
+          break;
+        case 3:
+          trainingUser = 'Caj'
+          break;
+        default:
+          console.log(`Sorry, we are out of ${trainingArr.uid}.`);
+      }
+    }
+    return {
+      user_id: uid,
+      name: trainingUser,
+      date: date,
+      hasTraining: !!trainingArr,
+      dayName: trainingName,
+      day_id : day_id,
+      calories: calories,
+      protein: protein,
+      carbs: carbs,
+      fats: fats,
+      bw: bw,
+      type: type,
+      amount: amount,
+      calorieTot: calorieTot,
+      proteinTot: proteinTot,
+      carbsTot: carbsTot,
+      fatsTot: fatsTot,
+    }
+  });
+
   function weeklyRecap(date) {
 
     let today = new Date(date);
@@ -219,9 +261,8 @@
       console.error('Day Submission failed');
     }
   }
-
   onMount(async () => {
-		console.log('DAYS ARRAY',daysArray);
+		//console.log('DAYS ARRAY',daysArray);
 	});
   
 </script>
@@ -244,61 +285,50 @@
   {#each emptyStartDays as _, i}
     <div class="dayContainer"></div>
   {/each}
+
   {#each daysArray as day}
   <div class={isSunday(day.date) ? 'sundayContainer' : 'dayContainer'}>
 
     <button class="dayButton">{day.date.slice(-2)}</button>
-
     <div class='mainInfo'>
+
       {#if day.hasTraining}
         <button class = 'activityButton' on:click={() => openDayPage(day.day_id, day.user_id)}>
           {day.dayName}
         </button>
+
       {:else}
         <button class='plusButton' on:click={() => (showModal = true, currentClickedDay = day)}>+</button>
       {/if}
 
-      {#each bwData as bw}
-        {#if bw.created_at === day.date && bw.uid === uid}
-          <p class='bodyweight'>{bw.bodyweight} kg</p>
-        {/if}
-      {/each}
+      {#if day.bw}
+        <p class='bodyweight'>{day.bw} kg</p>
+      {/if}
 
-      {#each caloriesData as cal}
-        {#if cal.created_at === day.date && cal.uid === uid}
-          <p class='bodyweight'>{cal.calories} kcal</p>
-        {/if}
-      {/each}
+      {#if day.calories}
+        <p class='bodyweight'>{day.calories} kcal</p>
+      {/if}
+
     </div>
 
     {#if isSunday(day.date)}
+
       <div class="recap">
-        {#each caloriesData as cal}
-          {#if cal.created_at === day.date && cal.uid === uid}
-            {#if cal.calorieTot}
-              {#each dietPlanData as dpd}
-                {#if dpd.uid === uid && isDateInCurrentOrFuture(dpd, day) && isSunday(day.date)}
-                    <div class='recap-text'>
-                      <p class='bodyweight'>{dpd.type}</p>
-                      <p class='bodyweight'>{cal.calorieTot} / {dpd.amount} kcal</p>
-                    </div>
-                    <div class='bodyweight'> {Math.trunc(cal.calorieTot/7)} / {Math.trunc(dpd.amount/7)} kcal</div>
-                    <div class='recap-text'> <p> P: {cal.proteinTot} / {Math.trunc(cal.proteinTot/7)}  g</p> </div>
-                    <div class='recap-text'> <p>C: {cal.carbsTot} / {Math.trunc(cal.carbsTot/7)}  g</p> </div>
-                    <div class='recap-text'> <p>F: {cal.fatsTot} / {Math.trunc(cal.fatsTot/7)}  g</p> </div>
-                {/if}
-              {/each}
+        {#if day.calorieTot && day.type}
+          <div class='recap-text'>
+            <p class='bodyweight'>{day.type}</p>
+            <p class='bodyweight'>{day.calorieTot} / {day.amount} kcal</p>
+          </div>
+          <div class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} kcal</div>
+          <div class='recap-text'> <p> P: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  g</p> </div>
+          <div class='recap-text'> <p>C: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  g</p> </div>
+          <div class='recap-text'> <p>F: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  g</p> </div>
 
-            {/if}
-          {/if}
-        {/each}
+        {/if}
+
       </div>
+
     {/if}
-
-    <!-- 
-
-    -->
-
     </div>
   {/each}
 </div>
@@ -332,6 +362,7 @@
     justify-content: space-between;
     align-items: center;
   }
+  
   .currentDayContainer {
     display: flex;
     flex-direction: column;

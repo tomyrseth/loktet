@@ -1,8 +1,7 @@
 <script lang='ts'>
-    import { browser } from '$app/environment';
   import { page } from '$app/stores';
   import Modal from '../../components/Modal.svelte';
-  import { onMount } from 'svelte';
+  import daysArray from '../../components/Calendar.svelte';
 
   type lifts = {
     id: number;
@@ -39,8 +38,6 @@
   let caloriesData = data.caloriesRes?.data;
   let currentDay = daysData.find(o => o.id.toString() === day_id);
   let today = currentDay.created_at;
-
-  console.log('Lifts Data: ', liftsData);
 
   for (let i = 0; i < liftsData.length; i++) {
     arr.push(liftsData[i].exercise_id);
