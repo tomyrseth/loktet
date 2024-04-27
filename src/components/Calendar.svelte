@@ -124,6 +124,7 @@
 
     let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
 
+    //Get all the data from supabase for the specific user
     let trainingArr = daysData.find(item => item.created_at === date && item.uid === uid);
     let caloriesArr = caloriesData.find(item => item.created_at === date && item.uid === uid);
     let bwArr = bwData.find(item => item.created_at === date && item.uid === uid);
@@ -184,7 +185,7 @@
       carbs: carbs,
       fats: fats,
       bw: bw,
-      type: type,
+      type: type, //Bulking, Cutting or Maintaining.
       amount: amount,
       calorieTot: calorieTot,
       proteinTot: proteinTot,
@@ -248,6 +249,10 @@
   async function submitData() {
 
     console.log(user_id, day_name,'POST DATA');
+    if (day_name.length > 13) {
+      alert('Day name too long! Max 13 chars.')
+      return 0;
+    }
     const response = await fetch('/api/addDay', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -262,7 +267,7 @@
     }
   }
   onMount(async () => {
-		//console.log('DAYS ARRAY',daysArray);
+		console.log('DAYS ARRAY',daysArray);
 	});
   
 </script>
