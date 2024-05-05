@@ -319,6 +319,7 @@
     {#if isSunday(day.date)}
 
       <div class="recap">
+        
         {#if day.calorieTot && day.type}
           <div class='recap-text'>
             <p class='bodyweight'>{day.type}</p>
