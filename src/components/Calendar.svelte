@@ -412,6 +412,7 @@
   }
 
   .currentDayContainer {
+    z-index: 1;
     border: solid 2px rgb(255, 89, 33);
   }
 
