@@ -298,7 +298,7 @@
   {/each}
 
   {#each daysArray as day}
-  <button class={isSunday(day.date) ? 'sundayContainer' : 'dayContainer'} 
+  <button class={isSunday(day.date) ? 'sundayContainer' : 'dayContainer'} class:currentDayContainer={isToday(day.date)} 
     on:click={() => openDayPage(day.day_id, day.user_id, day.hasTraining, day)}
   >
 
@@ -369,23 +369,7 @@
     align-items: center;
   }
   
-  .currentDayContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    color: rgb(255, 89, 33);
-    height: 150px;
-    width: 180px;
-    padding: 0px;
-    border: solid 2px rgb(255, 89, 33);
-    background-color: rgb(26, 26, 26);
-    margin: 1px;
-    transition: 0.3s;
-  }
-
-  .currentDayContainer:hover , .dayContainer:hover, .sundayContainer:hover {
+  .dayContainer:hover, .sundayContainer:hover {
     background-color: rgba(26, 26, 26, 0.825);
     transform: scale(1.05);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -425,6 +409,10 @@
     margin: 1px;
     transition: 0.3s;
     cursor: pointer;
+  }
+
+  .currentDayContainer {
+    border: solid 2px rgb(255, 89, 33);
   }
 
   .dayName {
