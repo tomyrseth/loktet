@@ -301,24 +301,23 @@
   <button class={isSunday(day.date) ? 'sundayContainer' : 'dayContainer'} class:currentDayContainer={isToday(day.date)} 
     on:click={() => openDayPage(day.day_id, day.user_id, day.hasTraining, day)}
   >
-
-    <span class="dayButton">{day.date.slice(-2)}</span>
-    <span class='mainInfo'>
+    <span class="weekDay">
+      <span class="dayNumber">{day.date.slice(-2)}</span>
       {#if day.hasTraining}
-        <span class='dayName'>
-          {day.dayName}
-        </span>
+        <span class='dayName'>{day.dayName}</span>
       {:else}
         <span class='plusButton'>+</span>
       {/if}
-
-      {#if day.bw}
-        <span class='bodyweight'>{day.bw} kg</span>
-      {/if}
-
-      {#if day.calories}
-        <span class='bodyweight'>{day.calories} kcal</span>
-      {/if}
+  
+      <span class='mainInfo'>
+        {#if day.bw}
+          <span class='bodyweight'>{day.bw} <span style='color: rgb(80, 80, 80)'>kg</span> </span>
+        {/if}
+  
+        {#if day.calories}
+          <span class='bodyweight'>{day.calories} <span style='color: rgb(80, 80, 80)'>kcal</span></span>
+        {/if}
+      </span>
     </span>
 
     {#if isSunday(day.date)}   
@@ -352,15 +351,12 @@
 </Modal>
 
 <style>
-  p {
-    margin: 0;
-  }
-
   .calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     text-align: center;
     color: white;
+    color: rgb(63, 63, 63);
   }
   .header {
     grid-column: span 7;
@@ -371,24 +367,30 @@
   
   .dayContainer:hover, .sundayContainer:hover {
     background-color: rgba(26, 26, 26, 0.825);
-    transform: scale(1.05);
+    transform: scale(1.1);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: solid 2px rgba(255, 88, 33, 0.616);
+    z-index: 1;
+  }
+
+  .dayContainer:active, .sundayContainer:active {
+    transform: scale(1.05);
+    background-color: black;
+    opacity: 0.8;
   }
 
   .dayContainer {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
     position: relative;
     color: rgb(255, 89, 33);
     height: 150px;
     width: 180px;
     padding: 0px;
-    border: solid 2px transparent;
+    border: solid 2px rgba(0, 0, 0, 0);
     border-radius: 5px;
     background-color: rgb(26, 26, 26);
-    margin: 1px;
+    margin: 0px 1px 0px 1px;
     transition: 0.3s;
     cursor: pointer;
   }
@@ -397,7 +399,6 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-items: center;
     position: relative;
     color: rgb(255, 89, 33);
     height: 150px;
@@ -416,13 +417,21 @@
     border: solid 2px rgb(255, 89, 33);
   }
 
+  .weekDay {
+    padding: 0.41em 0em 0em 0em;
+  }
+
   .dayName {
-    color: white;
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: rgb(223, 223, 223);
   }
 
   .mainInfo {
     display: flex;
     flex-direction: column;
+    padding: 1.5em 0em 0em 0em;
+
   }
 
   .recap {
@@ -432,10 +441,11 @@
     padding: 0;
   }
 
-  .dayButton {
+  .dayNumber {
+    font-size: 1.15rem;
     display: inline-block;
     position: absolute;
-    top: 0;
+    top: 6px;
     left: 0;
     color: rgb(255, 89, 33);
     margin: 0px;
@@ -445,18 +455,21 @@
   }
 
   .plusButton {
-    display: flex;
+    display: inline-block;
+    position: absolute;
     background-color: transparent;
-    border: solid 1px rgba(255, 88, 33, 0.303);
-    border-radius: 40px;
+    border: dashed 2px rgba(255, 88, 33, 0.303);
+    border-radius: 5px;
     color: rgba(255, 255, 255, 0.452);
     transition: 0.3s;
-    padding: 20px;
-    margin: 3px;
+    top: 3em;
+    left: 3.7em;
+    padding: 1em 1.2em 1em 1.2em;
   }
 
   .plusButton:hover {
     cursor: pointer;
+    border: solid 2px;
     border-color: rgb(255, 89, 33);
     color: white;
   }
@@ -492,5 +505,6 @@
 
   .bodyweight {
     color: rgb(0, 211, 84);
+    margin-bottom: 0.5em;
   }
 </style>
