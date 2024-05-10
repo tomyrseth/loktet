@@ -34,8 +34,8 @@
   let firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
   $: adjustedFirstDayOfMonth = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
 
-  $: monthName = currentDate.toLocaleString('default', { month: 'long' });
-  
+  $: monthName = currentDate.toLocaleString('se', { month: 'long' });
+  $: monthnameCapitalized = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   $: emptyStartDays = Array.from({ length: adjustedFirstDayOfMonth });
     
   // Highlight today
@@ -282,16 +282,16 @@
 <div class="calendar">
   <div class="header">
     <button on:click={() => navigateMonths(-1)} class="calendarNav">&lt;</button>
-      <span>{monthName} {currentYear}</span>
+      <span>{monthnameCapitalized} {currentYear}</span>
     <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
   </div>
-  <div class="dayName">Mon</div>
-  <div class="dayName">Tue</div>
-  <div class="dayName">Wed</div>
-  <div class="dayName">Thu</div>
-  <div class="dayName">Fri</div>
-  <div class="dayName">Sat</div>
-  <div class="dayName">Sun</div>
+  <div class="dayName">Mán</div> 
+  <div class="dayName">Dis</div>
+  <div class="dayName">Gas</div>
+  <div class="dayName">Duo</div>
+  <div class="dayName">Bea</div>
+  <div class="dayName">Láv</div>
+  <div class="dayName">Sot</div>
 
   {#each emptyStartDays as _, i}
     <button class="dayContainer non-clickable"></button>
