@@ -285,13 +285,13 @@
       <span>{monthnameCapitalized} {currentYear}</span>
     <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
   </div>
-  <div class="dayName">Mán</div> 
-  <div class="dayName">Dis</div>
-  <div class="dayName">Gas</div>
-  <div class="dayName">Duo</div>
-  <div class="dayName">Bea</div>
-  <div class="dayName">Láv</div>
-  <div class="dayName">Sot</div>
+  <div>Mán</div> 
+  <div>Dis</div>
+  <div>Gas</div>
+  <div>Duo</div>
+  <div>Bea</div>
+  <div>Láv</div>
+  <div>Sot</div>
 
   {#each emptyStartDays as _, i}
     <button class="dayContainer non-clickable"></button>
@@ -305,7 +305,7 @@
     <span class="dayButton">{day.date.slice(-2)}</span>
     <span class='mainInfo'>
       {#if day.hasTraining}
-        <span>
+        <span class='dayName'>
           {day.dayName}
         </span>
       {:else}
@@ -385,8 +385,10 @@
     transition: 0.3s;
   }
 
-  .currentDayContainer:hover , .dayContainer:hover {
-    background-color: rgba(26, 26, 26, 0.726);
+  .currentDayContainer:hover , .dayContainer:hover, .sundayContainer:hover {
+    background-color: rgba(26, 26, 26, 0.825);
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
   }
 
   .dayContainer {
@@ -425,8 +427,8 @@
     cursor: pointer;
   }
 
-  .sundayContainer:hover {
-    background-color: rgba(26, 26, 26, 0.726);
+  .dayName {
+    color: white;
   }
 
   .mainInfo {
@@ -451,17 +453,6 @@
     width: 40px;
     height: 30px;
     background-color: transparent;
-  }
-
-  .activityButton {
-    display: flex;
-    background-color: transparent;
-    border: solid 1px rgb(255, 89, 33);
-    border-radius: 5px;
-    color: white;
-    transition: 0.5s;
-    padding: 10px;
-    margin: 3px;
   }
 
   .plusButton {
