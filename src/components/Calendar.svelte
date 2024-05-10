@@ -52,8 +52,14 @@
     firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
   }
 
-  function openDayPage(day_id:number, user_id:number){
-    goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
+    if (hasTraining) {
+      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+    }
+    else if (!hasTraining) {
+      showModal = true;
+      currentClickedDay = day;
+    }
   }
 
   function isDateInCurrentOrFuture(dpd, day){
@@ -276,7 +282,7 @@
 <div class="calendar">
   <div class="header">
     <button on:click={() => navigateMonths(-1)} class="calendarNav">&lt;</button>
-    <span>{monthName} {currentYear}</span>
+      <span>{monthName} {currentYear}</span>
     <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
   </div>
   <div class="dayName">Mon</div>
@@ -288,54 +294,48 @@
   <div class="dayName">Sun</div>
 
   {#each emptyStartDays as _, i}
-    <div class="dayContainer"></div>
+    <button class="dayContainer non-clickable"></button>
   {/each}
 
   {#each daysArray as day}
-  <div class={isSunday(day.date) ? 'sundayContainer' : 'dayContainer'}>
+  <button class={isSunday(day.date) ? 'sundayContainer' : 'dayContainer'} 
+    on:click={() => openDayPage(day.day_id, day.user_id, day.hasTraining, day)}
+  >
 
-    <button class="dayButton">{day.date.slice(-2)}</button>
-    <div class='mainInfo'>
-
+    <span class="dayButton">{day.date.slice(-2)}</span>
+    <span class='mainInfo'>
       {#if day.hasTraining}
-        <button class = 'activityButton' on:click={() => openDayPage(day.day_id, day.user_id)}>
+        <span>
           {day.dayName}
-        </button>
-
+        </span>
       {:else}
-        <button class='plusButton' on:click={() => (showModal = true, currentClickedDay = day)}>+</button>
+        <span class='plusButton'>+</span>
       {/if}
 
       {#if day.bw}
-        <p class='bodyweight'>{day.bw} kg</p>
+        <span class='bodyweight'>{day.bw} kg</span>
       {/if}
 
       {#if day.calories}
-        <p class='bodyweight'>{day.calories} kcal</p>
+        <span class='bodyweight'>{day.calories} kcal</span>
       {/if}
+    </span>
 
-    </div>
+    {#if isSunday(day.date)}   
+      {#if day.calorieTot && day.type}
+        <span class='recap'>
 
-    {#if isSunday(day.date)}
+          <span class='bodyweight'>{day.type}</span>
+          <span class='bodyweight'>{day.calorieTot} / {day.amount} kcal</span>
+          <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} kcal</span>
+          <span class='recap-text'>  P: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  g </span>
+          <span class='recap-text'> C: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  g </span>
+          <span class='recap-text'> F: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  g </span>
 
-      <div class="recap">
-        
-        {#if day.calorieTot && day.type}
-          <div class='recap-text'>
-            <p class='bodyweight'>{day.type}</p>
-            <p class='bodyweight'>{day.calorieTot} / {day.amount} kcal</p>
-          </div>
-          <div class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} kcal</div>
-          <div class='recap-text'> <p> P: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  g</p> </div>
-          <div class='recap-text'> <p>C: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  g</p> </div>
-          <div class='recap-text'> <p>F: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  g</p> </div>
-
-        {/if}
-
-      </div>
-
+        </span>
+      {/if}
     {/if}
-    </div>
+    </button>
   {/each}
 </div>
 
@@ -404,6 +404,7 @@
     background-color: rgb(26, 26, 26);
     margin: 1px;
     transition: 0.3s;
+    cursor: pointer;
   }
 
   .sundayContainer {
@@ -421,6 +422,16 @@
     background-color: rgb(26, 26, 26);
     margin: 1px;
     transition: 0.3s;
+    cursor: pointer;
+  }
+
+  .sundayContainer:hover {
+    background-color: rgba(26, 26, 26, 0.726);
+  }
+
+  .mainInfo {
+    display: flex;
+    flex-direction: column;
   }
 
   .recap {
@@ -440,19 +451,6 @@
     width: 40px;
     height: 30px;
     background-color: transparent;
-    border: solid transparent 2px;
-    border-radius: 20px;
-    cursor: pointer;
-    transition: border 0.4s;
-  }
-
-  .dayButton:hover {
-    border: solid rgb(255, 89, 33) 2px;
-    border-radius: 20px;
-  }
-
-  .dayButton:active {
-    opacity: 0.5;
   }
 
   .activityButton {
@@ -488,15 +486,9 @@
     flex-direction: column;
   }
 
-  .activityButton:hover {
-    cursor: pointer;
-    color: black;
-    background-color: rgb(255, 89, 33);
-    border-radius: 25px;
-  }
-
-  .activityButton:active {
-    opacity: 0.5;
+  .non-clickable {
+    pointer-events: none;
+    cursor: default;
   }
 
   .calendarNav:hover {
