@@ -255,8 +255,8 @@
   async function submitData() {
 
     console.log(user_id, day_name,'POST DATA');
-    if (day_name.length > 13) {
-      alert('Day name too long! Max 13 chars.')
+    if (day_name.length > 10) {
+      alert('Day name too long! Max 10 chars.')
       return 0;
     }
     const response = await fetch('/api/addDay', {
@@ -341,9 +341,9 @@
 <Modal bind:showModal>
 
   <div class='modal'>
-    <h1>Day log</h1>
+    <h1 style='color: white'>Day log</h1>
 
-    <label for="">Name your day</label>
+    <label for="" style='color: white; padding-bottom: 1em'>Name your day</label>
     <input type="text" bind:value={day_name}>
 
     <button on:click="{submitData}">Submit</button>
