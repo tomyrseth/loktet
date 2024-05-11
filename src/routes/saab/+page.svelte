@@ -37,7 +37,6 @@
 	<title>Saab</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
-<button on:click={() => (showModal = true)}>Add Diet Plan</button>
 <div class="main-container">
   <div class="calendar">
     <Calendar {daysData} {bwData} {uid} {caloriesData} {dietPlanData}/>
@@ -61,6 +60,7 @@
 		</div>
 	</Modal>
 </div>
+<button on:click={() => (showModal = true)} class='dietPlan'>Add Diet Plan</button>
 
 <style>
 
@@ -77,4 +77,20 @@
     display: flex;
     flex-direction: column;
   }
+	.dietPlan {
+		margin-top: 5em;
+		max-width: 100px;
+		background-color: rgb(26, 26, 26);
+		color: rgb(255, 89, 33);
+		border: solid 2px transparent;
+		border-radius: 1em;
+		padding: 1em;
+		transition: 0.3s;
+}
+
+	.dietPlan:hover {
+		border: solid 2px rgb(255, 89, 33);
+		transform: scale(1.05);
+		cursor: pointer;
+	}
 </style>

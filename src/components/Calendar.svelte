@@ -255,8 +255,8 @@
   async function submitData() {
 
     console.log(user_id, day_name,'POST DATA');
-    if (day_name.length > 10) {
-      alert('Day name too long! Max 10 chars.')
+    if (day_name.length > 13) {
+      alert('Day name too long! Max 13 chars.')
       return 0;
     }
     const response = await fetch('/api/addDay', {
@@ -281,17 +281,20 @@
 
 <div class="calendar">
   <div class="header">
-    <button on:click={() => navigateMonths(-1)} class="calendarNav">&lt;</button>
-      <span>{monthnameCapitalized} {currentYear}</span>
-    <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
+    <div></div>
+    <span class='monthName'>{monthnameCapitalized} {currentYear}</span>
+    <div>
+      <button on:click={() => navigateMonths(-1)} class="calendarNav">&lt;</button>
+      <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
+    </div>
   </div>
-  <div>Mán</div> 
-  <div>Dis</div>
-  <div>Gas</div>
-  <div>Duo</div>
-  <div>Bea</div>
-  <div>Láv</div>
-  <div>Sot</div>
+  <div class='weekDayName'>Mán</div> 
+  <div class='weekDayName'>Dis</div>
+  <div class='weekDayName'>Gas</div>
+  <div class='weekDayName'>Duo</div>
+  <div class='weekDayName'>Bea</div>
+  <div class='weekDayName'>Láv</div>
+  <div class='weekDayName'>Sot</div>
 
   {#each emptyStartDays as _, i}
     <button class="dayContainer non-clickable"></button>
@@ -356,13 +359,14 @@
     grid-template-columns: repeat(7, 1fr);
     text-align: center;
     color: white;
-    color: rgb(63, 63, 63);
   }
   .header {
     grid-column: span 7;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    background: radial-gradient(circle, rgba(26, 26, 26), rgba(26, 26, 26, 0) 60%);
+    border-radius: 50px;
   }
   
   .dayContainer:hover, .sundayContainer:hover {
@@ -370,7 +374,7 @@
     transform: scale(1.1);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
     border: solid 2px rgba(255, 88, 33, 0.616);
-    z-index: 1;
+    z-index: 10;
   }
 
   .dayContainer:active, .sundayContainer:active {
@@ -418,12 +422,19 @@
   }
 
   .weekDay {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     padding: 0.41em 0em 0em 0em;
   }
 
   .dayName {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    max-width: 6em;
     font-size: 1.15rem;
-    font-weight: bold;
     color: rgb(223, 223, 223);
   }
 
@@ -461,7 +472,7 @@
     border: dashed 2px rgba(255, 88, 33, 0.303);
     border-radius: 5px;
     color: rgba(255, 255, 255, 0.452);
-    transition: 0.3s;
+    transition: 0.5s;
     top: 3em;
     left: 3.7em;
     padding: 1em 1.2em 1em 1.2em;
@@ -472,6 +483,7 @@
     border: solid 2px;
     border-color: rgb(255, 89, 33);
     color: white;
+    transform: scale(1.5);
   }
 
   .modal {
@@ -506,5 +518,19 @@
   .bodyweight {
     color: rgb(0, 211, 84);
     margin-bottom: 0.5em;
+  }
+
+  .monthName {
+    font-weight: bold;
+    margin-right: -8.5em;
+    font-size: 1.5rem;
+    color: rgb(255, 89, 33);
+  }
+
+  .weekDayName {
+    font-weight: bold;
+    font-size: 1rem;
+    color: rgb(255, 89, 33);
+    margin: 0.5em 0em 0.5em 0em;
   }
 </style>
