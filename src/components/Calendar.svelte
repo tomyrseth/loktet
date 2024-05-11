@@ -322,30 +322,25 @@
         {/if}
       </span>
     </span>
-
+    
     {#if isSunday(day.date)}   
-      <span class='test'>TEST</span>
+      {#if day.calorieTot && day.type}
+        <span class='test'>
+          <span class='bodyweight'>{day.type}</span>
+          <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+        </span>
+      {/if}
     {/if}
+
   </button>
 
 
-  <!-- 
-  {#if isSunday(day.date)}   
-    {#if day.calorieTot && day.type}
-      <span class='recap'>
 
-        <span class='bodyweight'>{day.type}</span>
-        <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-        <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-        <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-        <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-        <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-
-      </span>
-    {/if}
-  {/if}
   
-  -->
 
   {/each}
 </div>
@@ -377,19 +372,21 @@
     background: radial-gradient(circle, rgba(26, 26, 26), rgba(26, 26, 26, 0) 60%);
     border-radius: 50px;
   }
-  
-  .dayContainer:hover, .sundayContainer:hover {
-    background-color: rgba(26, 26, 26, 0.825);
-    transform: scale(1.1);
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-    border: solid 2px rgba(255, 88, 33, 0.616);
-    z-index: 10;
-  }
 
-  .dayContainer:active, .sundayContainer:active {
-    transform: scale(1.05);
+  .test {
+    position: absolute;
+    top: -2px;
+    left: 11em;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     background-color: black;
-    opacity: 0.8;
+    background-color: rgb(26, 26, 26);
+    border: solid 2px rgba(0, 0, 0, 0);
+    border-radius: 5px;
+    transition: 0.3s;
   }
 
   .dayContainer {
@@ -403,26 +400,23 @@
     border: solid 2px rgba(0, 0, 0, 0);
     border-radius: 5px;
     background-color: rgb(26, 26, 26);
-    margin: 0px 1px 0px 1px;
+    margin: 0px 1px 2px 1px;
     transition: 0.3s;
     cursor: pointer;
   }
 
-  .sundayContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    position: relative;
-    color: rgb(255, 89, 33);
-    height: 150px;
-    width: 300px;
-    padding: 0px;
-    border: solid 2px transparent;
-    border-radius: 5px;
-    background-color: rgb(26, 26, 26);
-    margin: 1px;
-    transition: 0.3s;
-    cursor: pointer;
+  .dayContainer:hover {
+    background-color: rgba(26, 26, 26, 0.825);
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+    border: solid 2px rgba(255, 88, 33, 0.616);
+    z-index: 10;
+  }
+
+  .dayContainer:active {
+    transform: scale(1.05);
+    background-color: black;
+    opacity: 0.8;
   }
 
   .currentDayContainer {
@@ -543,12 +537,4 @@
     margin: 0.5em 0em 0.5em 0em;
   }
 
-  .test {
-    position: absolute;
-    top: 0px;
-    left: 11.4em;
-    background-color: black;
-    width: 150%;
-    height: 100%;
-  }
 </style>
