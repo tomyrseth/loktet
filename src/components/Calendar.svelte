@@ -301,7 +301,7 @@
   {/each}
 
   {#each daysArray as day}
-  <button class={isSunday(day.date) ? 'sundayContainer' : 'dayContainer'} class:currentDayContainer={isToday(day.date)} 
+  <button class= 'dayContainer' class:currentDayContainer={isToday(day.date)} 
     on:click={() => openDayPage(day.day_id, day.user_id, day.hasTraining, day)}
   >
     <span class="weekDay">
@@ -324,20 +324,29 @@
     </span>
 
     {#if isSunday(day.date)}   
-      {#if day.calorieTot && day.type}
-        <span class='recap'>
-
-          <span class='bodyweight'>{day.type}</span>
-          <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-          <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-          <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-
-        </span>
-      {/if}
+      <span class='test'>TEST</span>
     {/if}
-    </button>
+  </button>
+
+
+  <!-- 
+  {#if isSunday(day.date)}   
+    {#if day.calorieTot && day.type}
+      <span class='recap'>
+
+        <span class='bodyweight'>{day.type}</span>
+        <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+        <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+        <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+        <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+        <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+
+      </span>
+    {/if}
+  {/if}
+  
+  -->
+
   {/each}
 </div>
 
@@ -532,5 +541,14 @@
     font-size: 1rem;
     color: rgb(255, 89, 33);
     margin: 0.5em 0em 0.5em 0em;
+  }
+
+  .test {
+    position: absolute;
+    top: 0px;
+    left: 11.4em;
+    background-color: black;
+    width: 150%;
+    height: 100%;
   }
 </style>
