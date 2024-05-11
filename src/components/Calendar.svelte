@@ -314,11 +314,11 @@
   
       <span class='mainInfo'>
         {#if day.bw}
-          <span class='bodyweight'>{day.bw} <span style='color: rgb(80, 80, 80)'>kg</span> </span>
+          <span class='bodyweight'>{day.bw} <abbr style='color: rgb(80, 80, 80)'>kg</abbr> </span>
         {/if}
   
         {#if day.calories}
-          <span class='bodyweight'>{day.calories} <span style='color: rgb(80, 80, 80)'>kcal</span></span>
+          <span class='bodyweight'>{day.calories} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
         {/if}
       </span>
     </span>
@@ -328,11 +328,11 @@
         <span class='recap'>
 
           <span class='bodyweight'>{day.type}</span>
-          <span class='bodyweight'>{day.calorieTot} / {day.amount} kcal</span>
-          <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} kcal</span>
-          <span class='recap-text'>  P: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  g </span>
-          <span class='recap-text'> C: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  g </span>
-          <span class='recap-text'> F: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  g </span>
+          <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
 
         </span>
       {/if}
