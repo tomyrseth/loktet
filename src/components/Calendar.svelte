@@ -43,82 +43,6 @@
     return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDate().toString().length<2) ? now.getDate().toString().padStart(2, '0') : now.getDate().toString()));
   };
 
-
-  function navigateMonths(step:number) {
-    currentDate = new Date(currentYear, currentMonth + step, 1);
-    currentMonth = currentDate.getMonth();
-    currentYear = currentDate.getFullYear();
-    daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-  }
-
-  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
-    if (hasTraining) {
-      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
-    }
-    else if (!hasTraining) {
-      showModal = true;
-      currentClickedDay = day;
-    }
-  }
-
-  function isDateInCurrentOrFuture(dpd, day){
-    const dataDate = new Date(dpd.created_at);
-    const dataYear = dataDate.getFullYear();
-    const dataMonth = dataDate.getMonth();
-    const dataDay = dataDate.getDate();
-
-    const dayDate = new Date(day.date);
-    const dayYear = dayDate.getFullYear();
-    const dayMonth = dayDate.getMonth();
-    const dayDay = dayDate.getDate();
-
-
-    if (dayYear < dataYear) return false;
-    if (dataYear === dayYear) {
-      if (dayMonth < dataMonth) return false;
-      if (dataMonth === dayMonth && dayDay < dataDay) return false;
-    }
-    return true;
-  }
-
-  function isSunday(date) {
-    let temp = new Date(date);
-    return temp.getDay() === 0;
-  }
-
-  function addRecapToCalories() {
-    let sundayList = [];
-    //First filter calories table for uid
-    const filteredUID = caloriesData.filter(item => item.uid === uid);
-
-    //Then get every object that is a sunday
-    for (let i = 0; i < filteredUID.length; i++) {
-      if(isSunday(filteredUID[i].created_at)){
-        sundayList.push(filteredUID[i]);
-      }
-    }
-    //start with first sunday and go back 6 days to calculcate average
-    for (let i = 0; i < sundayList.length; i++) {
-      let recap = weeklyRecap(sundayList[i].created_at);
-      sundayList[i].calorieTot = recap.calories;
-      sundayList[i].proteinTot = recap.protein;
-      sundayList[i].carbsTot = recap.carbs;
-      sundayList[i].fatsTot = recap.fats;
-    }
-
-    //when you have total for that week, merge with original calorie table
-    const additionalDataMap = new Map(sundayList.map(item => [`${item.id}-${item.created_at}`, item]));
-    caloriesData.forEach(item => {
-
-      const key = `${item.id}-${item.created_at}`;
-      if (additionalDataMap.has(key)) {
-        Object.assign(item, additionalDataMap.get(key));
-      }
-    });
-  }
-  addRecapToCalories();
-
   // Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
   // Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
   // This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
@@ -150,9 +74,9 @@
       bw = bwArr.bodyweight;
     }
     if (dietPlanArr){
-      // Step 1: Sort objects by id in descending order
+      // Sort objects by id in descending order
       dietPlanArr.sort((a, b) => b.id - a.id);
-      // Step 3: Find the first upcoming date
+      // Find the first upcoming date
       const result = dietPlanArr.find(item => new Date(item.created_at) < new Date(date));
       // Handle the case where no future date is found
       if (result){
@@ -241,6 +165,39 @@
     return {calories, protein, carbs, fats};
   }
 
+  function addRecapToCalories() {
+    let sundayList = [];
+    //First filter calories table for uid
+    const filteredUID = caloriesData.filter(item => item.uid === uid);
+
+    //Then get every object that is a sunday
+    for (let i = 0; i < filteredUID.length; i++) {
+      if(isSunday(filteredUID[i].created_at)){
+        sundayList.push(filteredUID[i]);
+      }
+    }
+    //start with first sunday and go back 6 days to calculcate average
+    for (let i = 0; i < sundayList.length; i++) {
+      let recap = weeklyRecap(sundayList[i].created_at);
+      sundayList[i].calorieTot = recap.calories;
+      sundayList[i].proteinTot = recap.protein;
+      sundayList[i].carbsTot = recap.carbs;
+      sundayList[i].fatsTot = recap.fats;
+    }
+
+    //when you have total for that week, merge with original calorie table
+    const additionalDataMap = new Map(sundayList.map(item => [`${item.id}-${item.created_at}`, item]));
+    caloriesData.forEach(item => {
+
+      const key = `${item.id}-${item.created_at}`;
+      if (additionalDataMap.has(key)) {
+        Object.assign(item, additionalDataMap.get(key));
+      }
+    });
+  }
+  addRecapToCalories();
+
+  //Format to 2024-01-01 format
   function formatDate(date) {
     const year = date.getFullYear();
     const month = date.getMonth() + 1; // getMonth() returns 0-11, add 1 for 1-12
@@ -250,8 +207,34 @@
     const formattedDay = day < 10 ? `0${day}` : `${day}`;
 
     return `${year}-${formattedMonth}-${formattedDay}`;
-}
+  }
 
+  function isSunday(date) {
+    let temp = new Date(date);
+    return temp.getDay() === 0;
+  }
+
+  //Navigate calendar
+  function navigateMonths(step:number) {
+    currentDate = new Date(currentYear, currentMonth + step, 1);
+    currentMonth = currentDate.getMonth();
+    currentYear = currentDate.getFullYear();
+    daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  }
+
+  //When day is clicked open the day and show lifts
+  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
+    if (hasTraining) {
+      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+    }
+    else if (!hasTraining) {
+      showModal = true;
+      currentClickedDay = day;
+    }
+  }
+
+  //BACKEND
   async function submitData() {
 
     console.log(user_id, day_name,'POST DATA');
@@ -273,7 +256,7 @@
     }
   }
   onMount(async () => {
-		console.log('DAYS ARRAY',daysArray);
+		//console.log('DAYS ARRAY',daysArray);
 	});
   
 </script>
@@ -386,7 +369,6 @@
     background-color: rgb(26, 26, 26);
     border: solid 2px rgba(0, 0, 0, 0);
     border-radius: 5px;
-    transition: 0.3s;
   }
 
   .dayContainer {
@@ -446,13 +428,6 @@
     flex-direction: column;
     padding: 1.5em 0em 0em 0em;
 
-  }
-
-  .recap {
-    display: flex;
-    flex-direction: column;
-    margin-left: 10px;
-    padding: 0;
   }
 
   .dayNumber {
