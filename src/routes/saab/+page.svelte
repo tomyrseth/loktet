@@ -93,4 +93,8 @@
 		transform: scale(1.05);
 		cursor: pointer;
 	}
+
+	label {
+		color: white;
+	}
 </style>
