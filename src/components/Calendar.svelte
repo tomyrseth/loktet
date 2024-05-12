@@ -251,7 +251,6 @@
       console.log('Day Submission successful', result);
       toast.push('Day submitted successfully!')
       dialog.close()
-      location.reload();
     } else {
       console.error('Day Submission failed');
       toast.push('Day submission failed.')
