@@ -1,7 +1,9 @@
 <script lang='ts'>
-  import Modal from '../components/Modal.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { toast } from '@zerodevx/svelte-toast'
+  import Modal from '../components/Modal.svelte';
+  let dialog;
 
 
   type daysTable = {
@@ -18,8 +20,6 @@
 
 
   export let uid = 0;
-  
-  let showModal = false;
   let user_id = 0;
   let day_name = '';
   let currentClickedDay:object;
@@ -43,6 +43,20 @@
     return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDate().toString().length<2) ? now.getDate().toString().padStart(2, '0') : now.getDate().toString()));
   };
 
+  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
+    if (hasTraining) {
+      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+    }
+    else if (!hasTraining) {
+      dialog.showModal()
+      currentClickedDay = day;
+    }
+  }
+
+  function isSunday(date) {
+    let temp = new Date(date);
+    return temp.getDay() === 0;
+  }
   // Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
   // Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
   // This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
@@ -209,11 +223,6 @@
     return `${year}-${formattedMonth}-${formattedDay}`;
   }
 
-  function isSunday(date) {
-    let temp = new Date(date);
-    return temp.getDay() === 0;
-  }
-
   //Navigate calendar
   function navigateMonths(step:number) {
     currentDate = new Date(currentYear, currentMonth + step, 1);
@@ -221,17 +230,6 @@
     currentYear = currentDate.getFullYear();
     daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
     firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-  }
-
-  //When day is clicked open the day and show lifts
-  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
-    if (hasTraining) {
-      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
-    }
-    else if (!hasTraining) {
-      showModal = true;
-      currentClickedDay = day;
-    }
   }
 
   //BACKEND
@@ -251,16 +249,20 @@
     if (response.ok) {
       const result = await response.json();
       console.log('Day Submission successful', result);
+      toast.push('Day submitted successfully!')
+      dialog.close()
+      location.reload();
     } else {
       console.error('Day Submission failed');
+      toast.push('Day submission failed.')
     }
   }
+  
   onMount(async () => {
 		//console.log('DAYS ARRAY',daysArray);
 	});
   
 </script>
-
 
 <div class="calendar">
   <div class="header">
@@ -321,14 +323,10 @@
 
   </button>
 
-
-
-  
-
   {/each}
 </div>
 
-<Modal bind:showModal>
+<Modal bind:dialog>
 
   <div class='modal'>
     <h1 style='color: white'>Day log</h1>
