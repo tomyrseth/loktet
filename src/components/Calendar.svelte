@@ -247,10 +247,11 @@
     });
 
     if (response.ok) {
-      const result = await response.json();
-      console.log('Day Submission successful', result);
+      //const result = await response.json();
+      console.log('Day Submission successful'); // (' Day... ', result);
       toast.push('Day submitted successfully!')
-      dialog.close()
+      location.reload();
+      
     } else {
       console.error('Day Submission failed');
       toast.push('Day submission failed.')
