@@ -9,7 +9,7 @@ export async function POST({ request }) {
   const { data, error } = await supabase
     .from('lifts')
     .insert([
-      { day_id: userData.day_id, exercise_id: userData.ex_id, sets: userData.sets, reps: userData.reps, weight: userData.weight, notes: userData.notes, }
+      { day_id: userData.day_id, exercise_id: userData.newExerciseId, sets: userData.sets, reps: userData.reps, weight: userData.weight, notes: userData.notes, }
     ]);
 
   if (error) throw new Error(error.message);

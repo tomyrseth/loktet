@@ -2,7 +2,8 @@
   import { page } from '$app/stores';
   import Modal from '../../components/Modal.svelte';
   import { toast } from '@zerodevx/svelte-toast'
-  let dialog;
+  import type { PageData } from '../$types';
+  import type { ActionData } from './$types';
   import daysArray from '../../components/Calendar.svelte';
 
   type lifts = {
@@ -15,29 +16,29 @@
     weight: number;
   }
 
+
+
   const url = $page.url;
   const user_id = url.searchParams.get('user_id');
   const day_id = url.searchParams.get('day_id');
-  let showModal = false;
-  let liftShow = false;
-  let bwShow = false;
-  let caloriesShow = false;
-  let exerciseSelect: object;
-  let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
-  let notes = '';
-  let user_name = '';
-  let ex_id = 0;
-  let exerciseTable :object;
-  let exercise_id_list = [];
-  let arr = [];
 
-  export let data;
+  let dialog;
+
+  let liftShow = false, bwShow = false, caloriesShow = false;
+  let exerciseSelect: object, newExerciseId :object;
+  let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0, ex_id = 0;
+  let notes = '', user_name = '';
+  let exercise_id_list = [], arr = [];
+
+  export let data: PageData;
+  export let form: ActionData;
   
   let liftsData = data.data;
   let exerciseData = data.exerciseRes?.data;
   let daysData = data.daysRes?.data;
   let bwData = data.bwRes?.data;
   let caloriesData = data.caloriesRes?.data;
+
   let currentDay = daysData.find(o => o.id.toString() === day_id);
   let today = currentDay.created_at;
 
@@ -92,44 +93,33 @@
       if (exResponse.ok) {
         const result = await exResponse.json();
         console.log('Exercise Submission successful', result);
-
-        //GET updated exercise table
-        const exerciseResponse = await fetch('/api/getExId', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        if (!exerciseResponse.ok) {
-          console.error("Error fetching data:", exerciseResponse.statusText);
-        } else {
-          exerciseTable = await exerciseResponse.json(); // This parses the JSON body of the response to get table from DB
+        newExerciseId = result.data[0].id;
         }
+      else {
+        console.error('Exercise Submission failed, aborting...');
+        toast.push('Exercise submission failed.')
 
-        //Find the newly made exercise and get its id.
-        let newExercise = exerciseTable.data.find(ex => ex.name === exerciseSelect);
-        ex_id = newExercise.id;
+      }
 
         //POST to lift table
         const liftResponse = await fetch('/api/addLift', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ day_id, ex_id, sets, reps, weight, notes })
+          body: JSON.stringify({ day_id, newExerciseId, sets, reps, weight, notes })
         });
 
         if (liftResponse.ok) {
           const result = await liftResponse.json();
           console.log('Lifts Submission successful', result);
           location.reload();
-        } else {
+        } 
+        else {
           console.error('Lifts Submission failed');
           toast.push('Lift submission failed.')
         }
-      }
-
-      else {
-        console.error('Exercise Submission failed, aborting...');
-      }
     }
   }
+
 
   async function submitBwData() {
     console.log(bodyweight, 'POST DATA');
@@ -260,29 +250,7 @@
   <Modal bind:dialog>
     {#if liftShow === true}
       <div class='modal'>
-        <h1>Training log</h1>
-
-        <label for="">Exercise: </label>
-        <input bind:value={exerciseSelect} type="text" list='exercises' />
-        <datalist id='exercises'>
-          {#each exerciseData as exercise}
-            <option>{exercise.name}</option>
-          {/each}
-        </datalist>
-
-        <label for="">Weight: </label>
-        <input type="text" bind:value={weight}>
-    
-        <label for="">Sets: </label>
-        <input type="text" bind:value={sets}>
-
-        <label for="">Reps: </label>
-        <input type="text" bind:value={reps}>
-
-        <label for="">Notes: </label>
-        <input type="text" bind:value={notes}>
-    
-        <button on:click="{submitLiftData}">Submit</button>
+        <form method='POST' action="?/removeItem"></form>
       </div>
 
     {:else if bwShow === true}
