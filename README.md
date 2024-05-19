@@ -16,7 +16,9 @@ Fitness tracker built with SvelteKit and Supabase.
 - Weekly recap of total macros last 7 days
 
 Upcoming:
+- User profiles
 - Create custom workout programs
+- Data displayed with graphs
 
 
 ## Screenshots
