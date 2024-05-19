@@ -1,7 +1,22 @@
 # Loktet // Lift
 
 WIP.
-Workout, bodyweight, calorie and macro logger built with SvelteKit and Supabase.
+
+Fitness tracker built with SvelteKit and Supabase.
+
+
+## Features
+- Workout days displayed on calendar, with daily calories and bodyweight if logged.
+- Lift logging
+- Calorie logging
+- Macro logging
+- Bodyweight logging
+- Diet plan logging (cutting/bulking/maintenance, and weekly calorie goal)
+- Weekly recap of calories compared to your diet plan goal
+- Weekly recap of total macros last 7 days
+
+Upcoming:
+- Create custom workout programs
 
 
 ## Screenshots
