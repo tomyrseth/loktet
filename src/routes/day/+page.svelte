@@ -25,7 +25,8 @@
   let dialog;
 
   let liftShow = false, bwShow = false, caloriesShow = false;
-  let exerciseSelect: object, newExerciseId :object;
+  let newExerciseId :object;
+  let exerciseSelect :string;
   let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0, ex_id = 0;
   let notes = '', user_name = '';
   let exercise_id_list = [], arr = [];
@@ -41,6 +42,12 @@
 
   let currentDay = daysData.find(o => o.id.toString() === day_id);
   let today = currentDay.created_at;
+  let exercise_id: number
+
+  $: if (exerciseSelect){
+    let ex_obj = exerciseData.find(o => o.name === exerciseSelect);
+    exercise_id = ex_obj.id;
+  }
 
   for (let i = 0; i < liftsData.length; i++) {
     arr.push(liftsData[i].exercise_id);
@@ -250,13 +257,53 @@
   <Modal bind:dialog>
     {#if liftShow === true}
       <div class='modal'>
-        <form method='POST' action="?/addItem">
-          <input type="text" name='exercise'>
+        <form method='POST' class='form'>
+
+          <label for='exercise'>Exercise: </label>
+          <select bind:value={exerciseSelect} name='exercise'>
+            {#each exerciseData as exercise}
+              <option >{exercise.name}</option>
+            {/each}
+          </select>
+          <option value={exerciseData}></option>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
 
+          <button>Add new exercise</button>
+
+          <label for='weight'>Weight: </label>
+          <input type="text" name='weight'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='sets'>Sets: </label>
+          <input type="text" name='sets'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='reps'>Reps: </label>
+          <input type="text" name='reps'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='notes'>Notes: </label>
+          <input type="text" name='notes'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <input type='hidden' name='ex_id' value={exercise_id} />
+          <input type='hidden' name='day_id' value={day_id} />
+          <input type='hidden' name='type' value='exercise' />
+
+
+
           <button type="submit">+ Add lift</button>
+          <p style="color: lightgrey;">(ESC to close)</p>
         
         </form>
       </div>
@@ -270,6 +317,8 @@
     {:else if caloriesShow === true}
       <div class='modal'>
         <h1>Calories log</h1>
+
+
 
         <label for="">Calories: </label>
         <input type="text" bind:value={calories}>
@@ -425,6 +474,11 @@
   .editButton:active{
     transform: scale(1);
     opacity: 0.3;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
   }
 
 </style>

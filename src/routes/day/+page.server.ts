@@ -19,17 +19,32 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
-  addItem: async ({ request }) => {
+  default: async ({ request }) => {
     const formData = await request.formData()
-    const item = String(formData.get('item'))
+    //const item = String(formData.get('item'))
+    const exercise = formData.get('exercise');
+    const weight = formData.get('weight');
+    const sets = formData.get('sets');
+    const reps = formData.get('reps');
+    const notes = formData.get('notes');
 
-    if (!item) {
-      return fail(400, { item, missing: true})
+    const ex_id = formData.get('ex_id');
+    console.log("🚀 ~ default: ~ ex_id:", ex_id)
+    const day_id = formData.get('day_id');
+
+    const { data, error } = await supabase
+    .from('lifts')
+    .insert([
+      { day_id: day_id, exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes }
+    ]);
+
+    if (!error) {
+      return { success: true , data: data}
     }
+    throw new Error(error.message);
+  }
 
-    addItem(item) //supabase docs
-    return { success: true }
-  },
+  /*
   removeItem: async ({ request }) => {
     const formData = await request.formData()
     const itemId = Number(formData.get('id'))
@@ -37,5 +52,6 @@ export const actions: Actions = {
     removeItem(itemId)//supabase docs
     return { success: true }
   }
+  */
 
 }

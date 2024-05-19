@@ -1,6 +1,6 @@
 import { supabase } from "$lib/supabaseClient";
 
-export async function load() {
+export async function load({ fetch, params }) {
   const exerciseRes = await supabase.from('exercises').select()
 
   const exercisesErr = exerciseRes.error;
