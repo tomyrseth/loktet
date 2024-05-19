@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ url }) => {
 };
 
 export const actions: Actions = {
-  addItem: async ({ request}) => {
+  addItem: async ({ request }) => {
     const formData = await request.formData()
     const item = String(formData.get('item'))
 

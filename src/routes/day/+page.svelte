@@ -250,7 +250,15 @@
   <Modal bind:dialog>
     {#if liftShow === true}
       <div class='modal'>
-        <form method='POST' action="?/removeItem"></form>
+        <form method='POST' action="?/addItem">
+          <input type="text" name='exercise'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <button type="submit">+ Add lift</button>
+        
+        </form>
       </div>
 
     {:else if bwShow === true}
