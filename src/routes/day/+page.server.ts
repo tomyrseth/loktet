@@ -2,9 +2,11 @@ import { supabase } from "$lib/supabaseClient";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
 
+let uid;
+
 export const load: PageServerLoad = async ({ url }) => {
   const day_id = url.searchParams.get('day_id');
-  const user_id = url.searchParams.get('user_id');
+  uid = url.searchParams.get('user_id');
 
   const { data, error } = await supabase
 
@@ -14,22 +16,16 @@ export const load: PageServerLoad = async ({ url }) => {
   return{
     data: data ?? [],
   };
-
-  return {name};
 };
 
 export const actions: Actions = {
-  default: async ({ request }) => {
+  lift: async ({ request }) => {
     const formData = await request.formData()
-    //const item = String(formData.get('item'))
-    const exercise = formData.get('exercise');
     const weight = formData.get('weight');
     const sets = formData.get('sets');
     const reps = formData.get('reps');
     const notes = formData.get('notes');
-
     const ex_id = formData.get('ex_id');
-    console.log("🚀 ~ default: ~ ex_id:", ex_id)
     const day_id = formData.get('day_id');
 
     const { data, error } = await supabase
@@ -42,16 +38,48 @@ export const actions: Actions = {
       return { success: true , data: data}
     }
     throw new Error(error.message);
+  },
+
+  bw: async ({ request }) => {
+    const formData = await request.formData();
+
+    const bw = formData.get('bw');
+    const today = formData.get('today');
+
+    const { data, error } = await supabase
+    .from('bodyweight')
+    .insert({ uid: uid, created_at: today, bodyweight: bw });
+
+    if (!error) {
+      return { success: true , data: data}
+    }
+    throw new Error(error.message);
+  },
+
+  calories: async ({ request }) => {
+    const formData = await request.formData();
+
+    const calories = formData.get('calories');
+    const protein = formData.get('protein');
+    const carbs = formData.get('carbs');
+    const fats = formData.get('fats');
+    const today = formData.get('today');
+
+    const { data, error } = await supabase
+    .from('calories')
+    .insert([
+      { uid: uid, calories: calories, created_at: today, protein: protein, carbs: carbs, fats: fats}
+    ]);
+
+    if (!error) {
+      return { success: true , data: data}
+    }
+    throw new Error(error.message);
   }
 
-  /*
-  removeItem: async ({ request }) => {
-    const formData = await request.formData()
-    const itemId = Number(formData.get('id'))
 
-    removeItem(itemId)//supabase docs
-    return { success: true }
-  }
-  */
+
+
+
 
 }

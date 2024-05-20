@@ -42,21 +42,6 @@
   $: isToday = (date:string) => {
     return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDate().toString().length<2) ? now.getDate().toString().padStart(2, '0') : now.getDate().toString()));
   };
-
-  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
-    if (hasTraining) {
-      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
-    }
-    else if (!hasTraining) {
-      dialog.showModal()
-      currentClickedDay = day;
-    }
-  }
-
-  function isSunday(date) {
-    let temp = new Date(date);
-    return temp.getDay() === 0;
-  }
   // Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
   // Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
   // This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
@@ -223,6 +208,21 @@
     return `${year}-${formattedMonth}-${formattedDay}`;
   }
 
+  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
+    if (hasTraining) {
+      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+	  }
+    else if (!hasTraining) {
+      dialog.showModal()
+      currentClickedDay = day;
+    }
+  }
+
+  function isSunday(date) {
+    let temp = new Date(date);
+    return temp.getDay() === 0;
+  }
+
   //Navigate calendar
   function navigateMonths(step:number) {
     currentDate = new Date(currentYear, currentMonth + step, 1);
@@ -234,8 +234,6 @@
 
   //BACKEND
   async function submitData() {
-
-    console.log(user_id, day_name,'POST DATA');
     if (day_name.length > 13) {
       alert('Day name too long! Max 13 chars.')
       return 0;
