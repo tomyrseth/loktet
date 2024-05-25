@@ -194,7 +194,7 @@
           {/if}
 
           <label for='weight'>Weight: </label>
-          <input type='number' name='weight'>
+          <input type='number' step='0.1' name='weight'>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
