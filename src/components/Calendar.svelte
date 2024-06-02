@@ -166,6 +166,8 @@
     const filteredUID = caloriesData.filter(item => item.uid === uid);
     const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at));
     if(matchingDates.length < 7){
+      console.log('Not enough days to make recap! Days now: ', matchingDates.length, 'user: ', user_id);
+      console.log(matchingDates);
       return 0;
     }
     
