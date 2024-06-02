@@ -21,12 +21,16 @@ export const load: PageServerLoad = async ({ url }) => {
 export const actions: Actions = {
   lift: async ({ request }) => {
     const formData = await request.formData()
-    const weight = formData.get('weight');
+    let weight = formData.get('weight');
     const sets = formData.get('sets');
     const reps = formData.get('reps');
     const notes = formData.get('notes');
     const ex_id = formData.get('ex_id');
     const day_id = formData.get('day_id');
+
+    if (!weight) {
+      weight = 0;
+    }
 
     const { data, error } = await supabase
     .from('lifts')
@@ -44,6 +48,7 @@ export const actions: Actions = {
     const formData = await request.formData();
 
     const bw = formData.get('bw');
+    
     const today = formData.get('today');
 
     const { data, error } = await supabase
