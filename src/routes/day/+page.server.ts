@@ -80,6 +80,31 @@ export const actions: Actions = {
       return { success: true , data: data}
     }
     throw new Error(error.message);
+  },
+
+  editLift: async ({ request }) => {
+    const formData = await request.formData()
+    let weight = formData.get('weight');
+    const sets = formData.get('sets');
+    const reps = formData.get('reps');
+    const notes = formData.get('notes');
+    const ex_id = formData.get('ex_id');
+    const day_id = formData.get('day_id');
+
+    if (!weight) {
+      weight = 0;
+    }
+
+    const { data, error } = await supabase
+    .from('lifts')
+    .insert([
+      { day_id: day_id, exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes }
+    ]);
+
+    if (!error) {
+      return { success: true , data: data}
+    }
+    throw new Error(error.message);
   }
 
 

@@ -32,7 +32,8 @@
   let bwData = data.bwRes?.data;
   let caloriesData = data.caloriesRes?.data;
 
-  let liftShow = false, bwShow = false, caloriesShow = false;
+  let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
+  $: console.log(liftShow);
   let exerciseSelect :string;
   let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
   let user_name = '';
@@ -64,6 +65,8 @@
   //For edit and delete functions
   function handleEditClick(lift) {
     console.log('Lift clicked: ', lift);
+    editShow = true;
+    dialog.showModal()
   }
 
   switch (user_id) {
@@ -87,9 +90,9 @@
   <div class="above">
 
     <div class="above-left">
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = true, bwShow = false, caloriesShow = false)}>Add Lift</button>
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = true, caloriesShow = false)}>Add BW</button>
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = false, caloriesShow = true)}>Add Calories</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = true,  bwShow = false, caloriesShow = false, editShow = false)}>Add Lift</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = true,  caloriesShow = false, editShow = false)}>Add BW</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = false, caloriesShow = true,  editShow = false)}>Add Calories</button>
     </div>
 
     <div class="above-right">
@@ -160,13 +163,15 @@
 
 
   <Modal bind:dialog>
+
     {#if liftShow === true}
+
       <div class='modal'>
         <form method='POST' class='form' action='?/lift' use:enhance={() => {
           return async ({ result }) => {
             if (result.type === 'success') {
-              console.log('lift submission success')
-              location.reload();
+              console.log('lift submission success', liftsData);
+              //location.reload();
             } else {
               console.log('lift submission failed')
             }
@@ -274,6 +279,72 @@
         <button type='submit'>Submit</button>
       
       </form>
+
+    {:else if editShow === true}
+      <div class='modal'>
+        <form method='POST' class='form' action='?/editLift' use:enhance={() => {
+          return async ({ result }) => {
+            if (result.type === 'success') {
+              console.log('lift update success')
+              location.reload();
+            } else {
+              console.log('lift update failed')
+            }
+          };
+        }}>
+          <h1>Lift log</h1>
+          <label for='exercise'>Exercise: </label>
+          <select bind:value={exerciseSelect} name='exercise'>
+            {#each exerciseData as exercise}
+              <option >{exercise.name}</option>
+            {/each}
+          </select>
+          <option value={exerciseData}></option>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <button type="button" on:click={() => newExercise = !newExercise}>
+            Add new exercise
+          </button>
+
+          {#if newExercise}
+            <label for="newEx">New exercise name:</label>
+            <input type="text" name='newEx'>
+          {/if}
+
+          <label for='weight'>Weight: </label>
+          <input type='number' step='0.1' name='weight'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='sets'>Sets: </label>
+          <input type='number' name='sets'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='reps'>Reps: </label>
+          <input type='number' name='reps'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='notes'>Notes: </label>
+          <input type="text" name='notes'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <input type='hidden' name='ex_id' value={exercise_id} />
+          <input type='hidden' name='day_id' value={day_id} />
+
+          <button type="submit">+ Add lift</button>
+          <p style="color: lightgrey;">(ESC to close)</p>
+        
+        </form>
+      </div>
 
     {/if}
   </Modal>
