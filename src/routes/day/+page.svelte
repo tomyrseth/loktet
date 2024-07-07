@@ -244,7 +244,7 @@
       }}>
         <h1>Bodyweight log</h1>
         <label for="">Bodyweight: </label>
-        <input type='number' name='bw'>
+        <input type='number' step='0.1' name='bw'>
         <input type='hidden' name='today' value={today} />
         <button type='submit'>Submit</button>
       </form>
