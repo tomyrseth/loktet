@@ -48,7 +48,7 @@
   $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
     let trainingUser = '', trainingName = ''
     let day_id = 0;
-    let calories = undefined, protein = undefined, carbs = undefined, fats = undefined, bw = undefined, calorieTot = undefined, proteinTot = undefined, carbsTot = undefined, fatsTot = undefined, type = undefined, amount = undefined, missingDays = undefined;
+    let calories = undefined, protein = undefined, carbs = undefined, fats = undefined, bw = undefined, calorieTot = undefined, proteinTot = undefined, carbsTot = undefined, fatsTot = undefined, type = undefined, amount = undefined, daysCompleted = undefined;
 
 
     let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
@@ -68,8 +68,8 @@
       proteinTot = caloriesArr.proteinTot;
       carbsTot = caloriesArr.carbsTot;
       fatsTot = caloriesArr.fatsTot;
-      missingDays = caloriesArr.missingDays;
-      console.log("🚀 ~ $:daysArray=Array.from ~ missingDays:", missingDays)
+      daysCompleted = caloriesArr.daysCompleted;
+      console.log("🚀 ~ $:daysArray=Array.from ~ daysCompleted:", daysCompleted)
     }
     if (bwArr){
       bw = bwArr.bodyweight;
@@ -121,7 +121,7 @@
       proteinTot: proteinTot,
       carbsTot: carbsTot,
       fatsTot: fatsTot,
-      missingDays: missingDays,
+      daysCompleted: daysCompleted,
     }
   });
 
@@ -135,7 +135,7 @@
     let protein = 0;
     let carbs = 0;
     let fats = 0;
-    let missingDays = 0;
+    let daysCompleted = 0;
 
     //put all next 6 days in an array
     let k = 0;
@@ -157,7 +157,7 @@
     const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at));
 
     //Length check
-    missingDays = 7 - matchingDates.length;
+    daysCompleted = matchingDates.length;
     
     //extract calories, protein, carbs, fats from them
     for (let i = 0; i < matchingDates.length; i++) {
@@ -166,7 +166,7 @@
       carbs += matchingDates[i].carbs;
       fats += matchingDates[i].fats;
     }
-    return {calories, protein, carbs, fats, missingDays};
+    return {calories, protein, carbs, fats, daysCompleted};
   }
 
   // First
@@ -189,7 +189,7 @@
       element.proteinTot = recap.protein;
       element.carbsTot = recap.carbs;
       element.fatsTot = recap.fats;
-      element.missingDays = recap.missingDays;
+      element.daysCompleted = recap.daysCompleted;
     });
 
     //when you have total for that week, merge with original calorie table
@@ -324,15 +324,15 @@
         <span class='test'>
           <span class='bodyweight'>{day.type}</span>
           <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='bodyweight'> {Math.trunc(day.calorieTot/7)} / {Math.trunc(day.amount/7)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-          <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-          <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='bodyweight'> {Math.trunc(day.calorieTot/day.daysCompleted)} / {Math.trunc(day.amount/day.daysCompleted)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
         </span>
 
-        {#if day.missingDays != 0 && day.calorieTot}
+        {#if day.daysCompleted != 7 && day.calorieTot}
           <span class='test2'>
-            <span class='bodyweight'> {(day.amount-day.calorieTot)/day.missingDays} per day to reach calorie goal</span>
+            <span class='bodyweight'> {(day.amount-day.calorieTot)/(7-day.daysCompleted)} per day to reach calorie goal</span>
           </span>
         {/if}
           
