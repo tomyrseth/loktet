@@ -141,6 +141,7 @@
   function weeklyRecap(date) {
 
     let today = new Date(date);
+    console.log("🚀 ~ weeklyRecap ~ today:", today)
     const week = [];
     const weekFormatted = [];
     let calories = 0;
@@ -157,6 +158,7 @@
         k = k+1;
       }
     }
+    
     //filter all 7 days into correct format
     for (let i = 0; i < week.length; i++) {
       weekFormatted.push(formatDate(week[i]));
@@ -165,9 +167,8 @@
     //get all the dates from caloriesData(supabase) that match the 7 days
     const filteredUID = caloriesData.filter(item => item.uid === uid);
     const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at));
+    
     if(matchingDates.length < 7){
-      console.log('Not enough days to make recap! Days now: ', matchingDates.length, 'user: ', user_id);
-      console.log(matchingDates);
       return 0;
     }
     
