@@ -87,6 +87,7 @@
     if (bwArr){
       bw = bwArr.bodyweight;
     }
+
     if (dietPlanArr){
       // Sort objects by id in descending order
       dietPlanArr.sort((a, b) => b.id - a.id);
@@ -116,6 +117,7 @@
         default:
           console.log(`Sorry, we are out of ${trainingArr.uid}.`);
       }
+
     }
     return {
       user_id: uid,
