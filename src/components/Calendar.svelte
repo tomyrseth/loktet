@@ -48,7 +48,7 @@
   $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
     let trainingUser = '', trainingName = ''
     let day_id = 0;
-    let calories = undefined, protein = undefined, carbs = undefined, fats = undefined, bw = undefined, calorieTot = undefined, proteinTot = undefined, carbsTot = undefined, fatsTot = undefined, type = undefined, amount = undefined;
+    let calories = undefined, protein = undefined, carbs = undefined, fats = undefined, bw = undefined, calorieTot = undefined, proteinTot = undefined, carbsTot = undefined, fatsTot = undefined, type = undefined, amount = undefined, missingDays = undefined;
 
 
     let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
@@ -68,6 +68,8 @@
       proteinTot = caloriesArr.proteinTot;
       carbsTot = caloriesArr.carbsTot;
       fatsTot = caloriesArr.fatsTot;
+      missingDays = caloriesArr.missingDays;
+      console.log("🚀 ~ $:daysArray=Array.from ~ missingDays:", missingDays)
     }
     if (bwArr){
       bw = bwArr.bodyweight;
@@ -82,7 +84,6 @@
         type = result.type;
         amount = result.amount;
       }
-
     }
       
     if (trainingArr){
@@ -120,9 +121,11 @@
       proteinTot: proteinTot,
       carbsTot: carbsTot,
       fatsTot: fatsTot,
+      missingDays: missingDays,
     }
   });
 
+  // Second
   function weeklyRecap(date) {
 
     let today = new Date(date);
@@ -132,16 +135,18 @@
     let protein = 0;
     let carbs = 0;
     let fats = 0;
+    let missingDays = 0;
 
-    //put all previous 7 days in an array
+    //put all next 6 days in an array
     let k = 0;
     for (let i = 0; i < 7; i++) {
-      let temp = today.setDate(today.getDate() -k);
+      let temp = today.setDate(today.getDate() +k);
       week.push(new Date(temp));
       if (k === 0){
         k = k+1;
       }
     }
+
     //filter all 7 days into correct format
     for (let i = 0; i < week.length; i++) {
       weekFormatted.push(formatDate(week[i]));
@@ -150,9 +155,9 @@
     //get all the dates from caloriesData(supabase) that match the 7 days
     const filteredUID = caloriesData.filter(item => item.uid === uid);
     const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at));
-    if(matchingDates.length < 7){
-      return 0;
-    }
+
+    //Length check
+    missingDays = 7 - matchingDates.length;
     
     //extract calories, protein, carbs, fats from them
     for (let i = 0; i < matchingDates.length; i++) {
@@ -161,31 +166,36 @@
       carbs += matchingDates[i].carbs;
       fats += matchingDates[i].fats;
     }
-    return {calories, protein, carbs, fats};
+    return {calories, protein, carbs, fats, missingDays};
   }
 
+  // First
   function addRecapToCalories() {
-    let sundayList = [];
+    let mondayList = [];
     //First filter calories table for uid
     const filteredUID = caloriesData.filter(item => item.uid === uid);
 
-    //Then get every object that is a sunday
+    //Then get every object that is a monday
     for (let i = 0; i < filteredUID.length; i++) {
-      if(isSunday(filteredUID[i].created_at)){
-        sundayList.push(filteredUID[i]);
+      if(isMonday(filteredUID[i].created_at)){
+        mondayList.push(filteredUID[i]);
       }
     }
-    //start with first sunday and go back 6 days to calculcate average
-    for (let i = 0; i < sundayList.length; i++) {
-      let recap = weeklyRecap(sundayList[i].created_at);
-      sundayList[i].calorieTot = recap.calories;
-      sundayList[i].proteinTot = recap.protein;
-      sundayList[i].carbsTot = recap.carbs;
-      sundayList[i].fatsTot = recap.fats;
-    }
+
+    //start with first monday and go forward 6 days to calculcate average
+    mondayList.forEach(element => {      
+      let recap = weeklyRecap(element.created_at);
+      element.calorieTot = recap.calories;
+      element.proteinTot = recap.protein;
+      element.carbsTot = recap.carbs;
+      element.fatsTot = recap.fats;
+      element.missingDays = recap.missingDays;
+    });
 
     //when you have total for that week, merge with original calorie table
-    const additionalDataMap = new Map(sundayList.map(item => [`${item.id}-${item.created_at}`, item]));
+
+    /*
+    const additionalDataMap = new Map(mondayList.map(item => [`${item.id}-${item.created_at}`, item]));
     caloriesData.forEach(item => {
 
       const key = `${item.id}-${item.created_at}`;
@@ -193,6 +203,9 @@
         Object.assign(item, additionalDataMap.get(key));
       }
     });
+    console.log(caloriesData,'after')
+    */
+
   }
   addRecapToCalories();
 
@@ -218,9 +231,9 @@
     }
   }
 
-  function isSunday(date) {
+  function isMonday(date) {
     let temp = new Date(date);
-    return temp.getDay() === 0;
+    return temp.getDay() === 1;
   }
 
   //Navigate calendar
@@ -257,7 +270,7 @@
   }
   
   onMount(async () => {
-		//console.log('DAYS ARRAY',daysArray);
+		console.log('DAYS ARRAY',daysArray);
 	});
   
 </script>
@@ -306,7 +319,7 @@
       </span>
     </span>
     
-    {#if isSunday(day.date)}   
+    {#if isMonday(day.date)}   
       {#if day.calorieTot && day.type}
         <span class='test'>
           <span class='bodyweight'>{day.type}</span>
@@ -316,6 +329,13 @@
           <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
           <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/7)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
         </span>
+
+        {#if day.missingDays != 0 && day.calorieTot}
+          <span class='test2'>
+            <span class='bodyweight'> {(day.amount-day.calorieTot)/day.missingDays} per day to reach calorie goal</span>
+          </span>
+        {/if}
+          
       {/if}
     {/if}
 
@@ -355,7 +375,22 @@
   .test {
     position: absolute;
     top: -2px;
-    left: 11em;
+    left: -12em;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-color: black;
+    background-color: rgb(26, 26, 26);
+    border: solid 2px rgba(0, 0, 0, 0);
+    border-radius: 5px;
+  }
+
+  .test2 {
+    position: absolute;
+    top: -2px;
+    left: 80em;
     width: 100%;
     height: 100%;
     display: flex;
