@@ -6,8 +6,9 @@
 	let dateSelected = '';
 	let calorieGoal = 0;
 	let cbm = '';
-
+	let dialog;
 	let plan = ['Cutting', 'Bulking', 'Maintenance']
+
 	const daysData = data.daysRes.data;
 	const bwData = data.bwRes.data;
 	const caloriesData = data.caloriesRes.data;
@@ -42,10 +43,10 @@
     <Calendar {daysData} {bwData} {uid} {caloriesData} {dietPlanData}/>
   </div>
 
-	<Modal bind:showModal>
+	<Modal bind:dialog>
 		<div class="modal">
 			<label for="">Date: </label>
-			<input type="date" bind:value={dateSelected}>
+			<input type="date">
 
 			<label for="">Cutting/Bulking/Maintenance: </label>
 			<select bind:value={cbm} name="" id="">
@@ -55,12 +56,12 @@
 			</select>
 
 			<label for="">Weekly calorie goal: </label>
-			<input type="text" bind:value={calorieGoal}>
-			<button on:click="{submitData}">Submit</button>
+			<input type='number' name='calorieGoal'>
+			<button type='submit'>Submit</button>
 		</div>
 	</Modal>
 </div>
-<button on:click={() => (showModal = true)} class='dietPlan'>Add Diet Plan</button>
+<button on:click={() => dialog.showModal()} class='dietPlan'>Add Diet Plan</button>
 
 <style>
 

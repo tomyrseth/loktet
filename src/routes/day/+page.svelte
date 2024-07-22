@@ -1,9 +1,11 @@
 <script lang='ts'>
   import { page } from '$app/stores';
+  import { goto } from '$app/navigation';
   import Modal from '../../components/Modal.svelte';
   import { toast } from '@zerodevx/svelte-toast'
-  let dialog;
-  import daysArray from '../../components/Calendar.svelte';
+  import type { PageData } from '../$types';
+  import type { ActionData } from './$types';
+  import { enhance } from '$app/forms';
 
   type lifts = {
     id: number;
@@ -15,36 +17,44 @@
     weight: number;
   }
 
+  export let data: PageData;
+  export let form: ActionData;
+
+  let dialog;
+
   const url = $page.url;
   const user_id = url.searchParams.get('user_id');
   const day_id = url.searchParams.get('day_id');
-  let showModal = false;
-  let liftShow = false;
-  let bwShow = false;
-  let caloriesShow = false;
-  let exerciseSelect: object;
-  let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
-  let notes = '';
-  let user_name = '';
-  let ex_id = 0;
-  let exerciseTable :object;
-  let exercise_id_list = [];
-  let arr = [];
 
-  export let data;
-  
   let liftsData = data.data;
   let exerciseData = data.exerciseRes?.data;
   let daysData = data.daysRes?.data;
   let bwData = data.bwRes?.data;
   let caloriesData = data.caloriesRes?.data;
+
+  let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
+  $: console.log(liftShow);
+  let exerciseSelect :string;
+  let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
+  let user_name = '';
+  let exercise_id_list = [], arr = [];
+  let newExercise = false;
+
   let currentDay = daysData.find(o => o.id.toString() === day_id);
+
   let today = currentDay.created_at;
 
-  for (let i = 0; i < liftsData.length; i++) {
-    arr.push(liftsData[i].exercise_id);
-    exercise_id_list = [...new Set(arr)];
+  let exercise_id: number
+
+  $: if (exerciseSelect){
+    let ex_obj = exerciseData.find(o => o.name === exerciseSelect);
+    exercise_id = ex_obj.id;
   }
+
+  liftsData.forEach(element =>{
+    arr.push(element.exercise_id);
+    exercise_id_list = [...new Set(arr)];
+  });
 
   //Find exercise name based on id
   function findExName (id:number){
@@ -52,120 +62,11 @@
     return ex_name.name;
   }
 
+  //For edit and delete functions
   function handleEditClick(lift) {
     console.log('Lift clicked: ', lift);
-  }
-
-  //Submit new lift today
-  async function submitLiftData() {
-    //Finds correct row if exercise already exists
-    let ex_obj = exerciseData.find(o => o.name === exerciseSelect);
-
-    //If exercise already exists
-    if (ex_obj){
-      ex_id = ex_obj.id;
-
-      const liftResponse = await fetch('/api/addLift', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ day_id, ex_id, sets, reps, weight, notes })
-      });
-
-      if (liftResponse.ok) {
-        const result = await liftResponse.json();
-        console.log('Submission successful', result);
-        location.reload();
-      } else {
-        console.error('Lift Submission failed');
-        toast.push('Lift submission failed.')
-      }
-    }
-
-    //If exercise doesnt already exist, POST it and then get its ID.
-    else {
-      const exResponse = await fetch('/api/addEx', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ exerciseSelect })
-      });
-
-      if (exResponse.ok) {
-        const result = await exResponse.json();
-        console.log('Exercise Submission successful', result);
-
-        //GET updated exercise table
-        const exerciseResponse = await fetch('/api/getExId', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-        });
-        if (!exerciseResponse.ok) {
-          console.error("Error fetching data:", exerciseResponse.statusText);
-        } else {
-          exerciseTable = await exerciseResponse.json(); // This parses the JSON body of the response to get table from DB
-        }
-
-        //Find the newly made exercise and get its id.
-        let newExercise = exerciseTable.data.find(ex => ex.name === exerciseSelect);
-        ex_id = newExercise.id;
-
-        //POST to lift table
-        const liftResponse = await fetch('/api/addLift', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ day_id, ex_id, sets, reps, weight, notes })
-        });
-
-        if (liftResponse.ok) {
-          const result = await liftResponse.json();
-          console.log('Lifts Submission successful', result);
-          location.reload();
-        } else {
-          console.error('Lifts Submission failed');
-          toast.push('Lift submission failed.')
-        }
-      }
-
-      else {
-        console.error('Exercise Submission failed, aborting...');
-      }
-    }
-  }
-
-  async function submitBwData() {
-    console.log(bodyweight, 'POST DATA');
-    const response = await fetch('/api/addBw', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id, today, bodyweight})
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log('BW Submission successful', result);
-      location.reload();
-    } else {
-      console.error('BW Submission failed');
-      toast.push('BW submission failed.')
-    }
-
-  }
-
-  async function submitCaloriesData() {
-    console.log(calories,'POST DATA');
-    const response = await fetch('/api/addCalories', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id, calories , today, protein, carbs, fats })
-    });
-
-    if (response.ok) {
-      const result = await response.json();
-      console.log('Calories Submission successful', result);
-      location.reload();
-    } else {
-      console.error('Calories Submission failed');
-      toast.push('Calories submission failed.')
-    }
+    editShow = true;
+    dialog.showModal()
   }
 
   switch (user_id) {
@@ -185,14 +86,13 @@
 </script>
 
 <div class='main'>
-
   <h1>{user_name}'s workout, {currentDay.created_at}.</h1>
   <div class="above">
 
     <div class="above-left">
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = true, bwShow = false, caloriesShow = false)}>Add Lift</button>
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = true, caloriesShow = false)}>Add BW</button>
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = false, caloriesShow = true)}>Add Calories</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = true,  bwShow = false, caloriesShow = false, editShow = false)}>Add Lift</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = true,  caloriesShow = false, editShow = false)}>Add BW</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = false, caloriesShow = true,  editShow = false)}>Add Calories</button>
     </div>
 
     <div class="above-right">
@@ -228,6 +128,7 @@
             {#each liftsData as lift}
               {#if lift.exercise_id === ex}
                 <div class='movement'>
+
                   <button class='editButton' on:click={() => handleEditClick(lift)}>
                     <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
                       <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
@@ -235,19 +136,23 @@
                       <path d="M13.5 6.5l4 4" />
                     </svg>
                   </button>
+
                   {#if lift.weight !== 0}
                     <p>Weight: <span style='color: rgb(255, 89, 33)'>{lift.weight}</span></p>
                   {/if}
 
                   <p>Sets: <span style='color: rgb(255, 89, 33)'>{lift.sets}</span></p>
+
                   {#if lift.reps === 0}
                     <p><span style='color: rgb(255, 0, 0)'>Reps: {lift.reps}</span></p>
                   {:else}
                     <p>Reps: <span style='color: rgb(255, 89, 33)'>{lift.reps}</span></p>
                   {/if}
+
                   {#if lift.notes !== ''}
                     <p>Notes: <span style='color: rgb(120, 120, 120)'>{lift.notes}</span></p>
                   {/if}
+
                 </div>
               {/if}
             {/each}
@@ -258,90 +163,192 @@
 
 
   <Modal bind:dialog>
+
     {#if liftShow === true}
+
       <div class='modal'>
-        <h1>Training log</h1>
+        <form method='POST' class='form' action='?/lift' use:enhance={() => {
+          return async ({ result }) => {
+            if (result.type === 'success') {
+              console.log('lift submission success', liftsData);
+              //location.reload();
+            } else {
+              console.log('lift submission failed')
+            }
+          };
+        }}>
+          <h1>Lift log</h1>
+          <label for='exercise'>Exercise: </label>
+          <select bind:value={exerciseSelect} name='exercise'>
+            {#each exerciseData as exercise}
+              <option >{exercise.name}</option>
+            {/each}
+          </select>
+          <option value={exerciseData}></option>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
 
-        <label for="">Exercise: </label>
-        <input bind:value={exerciseSelect} type="text" list='exercises' />
-        <datalist id='exercises'>
-          {#each exerciseData as exercise}
-            <option>{exercise.name}</option>
-          {/each}
-        </datalist>
+          <button type="button" on:click={() => newExercise = !newExercise}>
+            Add new exercise
+          </button>
 
-        <label for="">Weight: </label>
-        <input type="text" bind:value={weight}>
-    
-        <label for="">Sets: </label>
-        <input type="text" bind:value={sets}>
+          {#if newExercise}
+            <label for="newEx">New exercise name:</label>
+            <input type="text" name='newEx'>
+          {/if}
 
-        <label for="">Reps: </label>
-        <input type="text" bind:value={reps}>
+          <label for='weight'>Weight: </label>
+          <input type='number' step='0.1' name='weight'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
 
-        <label for="">Notes: </label>
-        <input type="text" bind:value={notes}>
-    
-        <button on:click="{submitLiftData}">Submit</button>
+          <label for='sets'>Sets: </label>
+          <input type='number' name='sets'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='reps'>Reps: </label>
+          <input type='number' name='reps'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='notes'>Notes: </label>
+          <input type="text" name='notes'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <input type='hidden' name='ex_id' value={exercise_id} />
+          <input type='hidden' name='day_id' value={day_id} />
+
+          <button type="submit">+ Add lift</button>
+          <p style="color: lightgrey;">(ESC to close)</p>
+        
+        </form>
       </div>
 
     {:else if bwShow === true}
-      <h1>Bodyweight log</h1>
-      <label for="">Bodyweight: </label>
-      <input type="text" bind:value={bodyweight}>
-      <button on:click="{submitBwData}">Submit</button>
+      <form method='POST' class='form' action='?/bw' use:enhance={() => {
+        return async ({ result }) => {
+          if (result.type === 'success') {
+            console.log('Bodyweight submission success')
+            location.reload();
+          } else {
+            console.log('Bodyweight submission failed', result);
+          }
+        };
+      }}>
+        <h1>Bodyweight log</h1>
+        <label for="">Bodyweight: </label>
+        <input type='number' step='0.1' name='bw'>
+        <input type='hidden' name='today' value={today} />
+        <button type='submit'>Submit</button>
+      </form>
 
     {:else if caloriesShow === true}
-      <div class='modal'>
+      <form method='POST' class='form' action='?/calories' use:enhance={() => {
+        return async ({ result }) => {
+          if (result.type === 'success') {
+            console.log('Calories submission success')
+            location.reload();
+          } else {
+            console.log('Calories submission failed', result)
+          }
+        };
+      }}>
         <h1>Calories log</h1>
 
         <label for="">Calories: </label>
-        <input type="text" bind:value={calories}>
+        <input type='number' name='calories'>
 
         <label for="">Protein: </label>
-        <input type="text" bind:value={protein}>
+        <input type='number' name='protein'>
 
         <label for="">Carbs: </label>
-        <input type="text" bind:value={carbs}>
+        <input type='number' name='carbs'>
 
         <label for="">Fats: </label>
-        <input type="text" bind:value={fats}>
+        <input type='number' name='fats'>
 
-        <button on:click="{submitCaloriesData}">Submit</button>
-      </div>
-    {/if}
+        <input type='hidden' name='today' value={today} />
 
-  </Modal>
-
-  <!--
-
-  <Modal bind:showModal2>
-
-    <div class='modal'>
-      <h1>Bodyweight log</h1>
-
-      <label for="">Weight: </label>
-      <input type="text" bind:value={bodyweight}>
+        <button type='submit'>Submit</button>
       
-      <button on:click="{submitBwData}">Submit</button>
-    </div>
+      </form>
+
+    {:else if editShow === true}
+      <div class='modal'>
+        <form method='POST' class='form' action='?/editLift' use:enhance={() => {
+          return async ({ result }) => {
+            if (result.type === 'success') {
+              console.log('lift update success')
+              location.reload();
+            } else {
+              console.log('lift update failed')
+            }
+          };
+        }}>
+          <h1>Lift log</h1>
+          <label for='exercise'>Exercise: </label>
+          <select bind:value={exerciseSelect} name='exercise'>
+            {#each exerciseData as exercise}
+              <option >{exercise.name}</option>
+            {/each}
+          </select>
+          <option value={exerciseData}></option>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <button type="button" on:click={() => newExercise = !newExercise}>
+            Add new exercise
+          </button>
+
+          {#if newExercise}
+            <label for="newEx">New exercise name:</label>
+            <input type="text" name='newEx'>
+          {/if}
+
+          <label for='weight'>Weight: </label>
+          <input type='number' step='0.1' name='weight'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='sets'>Sets: </label>
+          <input type='number' name='sets'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='reps'>Reps: </label>
+          <input type='number' name='reps'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='notes'>Notes: </label>
+          <input type="text" name='notes'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <input type='hidden' name='ex_id' value={exercise_id} />
+          <input type='hidden' name='day_id' value={day_id} />
+
+          <button type="submit">+ Add lift</button>
+          <p style="color: lightgrey;">(ESC to close)</p>
+        
+        </form>
+      </div>
+
+    {/if}
   </Modal>
-
-  <Modal bind:showModal3>
-
-    <div class='modal'>
-      <h1>Calorie log</h1>
-
-      <label for="">Weight: </label>
-      <input type="text" bind:value={calories}>
-
-      <button on:click="{submitCalorieData}">Submit</button>
-    </div>
-  </Modal>
-  -->
-
 </div>
-
 
 <style>
   .outer-movement-container {
@@ -449,6 +456,11 @@
   .editButton:active{
     transform: scale(1);
     opacity: 0.3;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
   }
 
 </style>

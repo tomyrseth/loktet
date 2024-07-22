@@ -9,6 +9,73 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bodyweight: {
+        Row: {
+          bodyweight: number | null
+          created_at: string
+          id: number
+          uid: number
+        }
+        Insert: {
+          bodyweight?: number | null
+          created_at: string
+          id?: number
+          uid: number
+        }
+        Update: {
+          bodyweight?: number | null
+          created_at?: string
+          id?: number
+          uid?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_bodyweight_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      calories: {
+        Row: {
+          calories: number | null
+          carbs: number | null
+          created_at: string
+          fats: number | null
+          id: number
+          protein: number | null
+          uid: number
+        }
+        Insert: {
+          calories?: number | null
+          carbs?: number | null
+          created_at: string
+          fats?: number | null
+          id?: number
+          protein?: number | null
+          uid: number
+        }
+        Update: {
+          calories?: number | null
+          carbs?: number | null
+          created_at?: string
+          fats?: number | null
+          id?: number
+          protein?: number | null
+          uid?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_calories_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       day_templates: {
         Row: {
           day_name: string | null
@@ -40,23 +107,55 @@ export type Database = {
           created_at: string
           id: number
           name: string | null
-          uid: number | null
+          uid: number
         }
         Insert: {
           created_at?: string
           id?: number
           name?: string | null
-          uid?: number | null
+          uid: number
         }
         Update: {
           created_at?: string
           id?: number
           name?: string | null
-          uid?: number | null
+          uid?: number
         }
         Relationships: [
           {
             foreignKeyName: "public_days_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      diet_plan: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: number
+          type: string
+          uid: number
+        }
+        Insert: {
+          amount?: number | null
+          created_at: string
+          id?: number
+          type: string
+          uid: number
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: number
+          type?: string
+          uid?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_diet plan_uid_fkey"
             columns: ["uid"]
             isOneToOne: false
             referencedRelation: "users"
@@ -124,50 +223,6 @@ export type Database = {
           },
         ]
       }
-      personInfo: {
-        Row: {
-          age: number | null
-          bw: number
-          calories: number | null
-          carbs: number | null
-          date: string | null
-          fats: number | null
-          height: number | null
-          id: number
-          protein: number | null
-        }
-        Insert: {
-          age?: number | null
-          bw: number
-          calories?: number | null
-          carbs?: number | null
-          date?: string | null
-          fats?: number | null
-          height?: number | null
-          id?: number
-          protein?: number | null
-        }
-        Update: {
-          age?: number | null
-          bw?: number
-          calories?: number | null
-          carbs?: number | null
-          date?: string | null
-          fats?: number | null
-          height?: number | null
-          id?: number
-          protein?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_personInfo_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       program_templates: {
         Row: {
           id: number
@@ -183,61 +238,58 @@ export type Database = {
         }
         Relationships: []
       }
+      protein: {
+        Row: {
+          amount: number | null
+          created_at: string
+          id: number
+          uid: number | null
+        }
+        Insert: {
+          amount?: number | null
+          created_at: string
+          id?: number
+          uid?: number | null
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          id?: number
+          uid?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_protein_uid_fkey"
+            columns: ["uid"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
+          birthday: number | null
+          email: string | null
+          height: string | null
           id: number
           name: string
         }
         Insert: {
+          birthday?: number | null
+          email?: string | null
+          height?: string | null
           id?: number
           name?: string
         }
         Update: {
+          birthday?: number | null
+          email?: string | null
+          height?: string | null
           id?: number
           name?: string
         }
         Relationships: []
-      }
-      workout_logs: {
-        Row: {
-          aigi: string | null
-          dahton: string | null
-          exercise_id: number
-          id: number
-          notes: string | null
-          reps: number | null
-          sets: number | null
-          weight: number | null
-        }
-        Insert: {
-          aigi?: string | null
-          dahton?: string | null
-          exercise_id: number
-          id?: number
-          notes?: string | null
-          reps?: number | null
-          sets?: number | null
-          weight?: number | null
-        }
-        Update: {
-          aigi?: string | null
-          dahton?: string | null
-          exercise_id?: number
-          id?: number
-          notes?: string | null
-          reps?: number | null
-          sets?: number | null
-          weight?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_workout_logs_id_fkey"
-            columns: ["id"]
-            isOneToOne: true
-            referencedRelation: "exercises"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       workout_templates: {
         Row: {
