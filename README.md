@@ -7,6 +7,7 @@ Fitness tracker built with SvelteKit and Supabase.
 
 ## Features
 - Workout days displayed on calendar, with daily calories and bodyweight if logged.
+- Show how many calories you need to eat on average every day throughout the week as you track.
 - Lift logging
 - Calorie logging
 - Macro logging
