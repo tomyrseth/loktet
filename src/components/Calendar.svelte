@@ -3,29 +3,27 @@
   import { goto } from '$app/navigation';
   import { toast } from '@zerodevx/svelte-toast'
   import Modal from '../components/Modal.svelte';
-  let dialog;
+  import type { Database } from '$lib/types/supabase';
 
+  type daysType = [Database['public']['Tables']['days']['Row']]
+  type bwType = [Database['public']['Tables']['bodyweight']['Row']]
+  type caloriesType = [Database['public']['Tables']['calories']['Row']]
+  type dietPlanType = [Database['public']['Tables']['diet_plan']['Row']]
+  
 
-  type daysTable = {
-    created_at: string,
-    id: number;
-    name: string;
-    uid: number;
-  }
-
-  export let daysData :daysTable[];
-  export let bwData;
-  export let caloriesData;
-  export let dietPlanData;
-
-
+  export let daysData :daysType;
+  export let bwData :bwType;
+  export let caloriesData :caloriesType;
+  export let dietPlanData :dietPlanType;
+  
   export let uid = 0;
-  let user_id = 0;
+
+  let dialog; // ANY type, TODO make a type for this
   let day_name = '';
   let currentClickedDay:object;
 
   let now = new Date();
-  let nowMonth = now.getMonth()+1; //+1 because start from 0
+  let nowMonth = now.getMonth()+1; //+1 because it starts from 0, I want it to start from 1
 
   let currentDate = new Date();
   let currentMonth = currentDate.getMonth(); 
@@ -42,9 +40,14 @@
   $: isToday = (date:string) => {
     return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDate().toString().length<2) ? now.getDate().toString().padStart(2, '0') : now.getDate().toString()));
   };
-  // Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
-  // Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
-  // This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
+
+  /*
+  daysArray: largest datapoint in the application, it's a reactive (declared by $:) array of objects, each individual day on the calendar is a object of daysArray.
+
+  Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
+  Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
+  This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
+  */ 
   $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
     let trainingUser = '', trainingName = ''
     let day_id = 0;
@@ -64,12 +67,13 @@
       protein = caloriesArr.protein;
       carbs = caloriesArr.carbs;
       fats = caloriesArr.fats;
+
+      // Below variables extend current calorie table from supabase
       calorieTot = caloriesArr.calorieTot;
       proteinTot = caloriesArr.proteinTot;
       carbsTot = caloriesArr.carbsTot;
       fatsTot = caloriesArr.fatsTot;
       daysCompleted = caloriesArr.daysCompleted;
-      console.log("🚀 ~ $:daysArray=Array.from ~ daysCompleted:", daysCompleted)
     }
     if (bwArr){
       bw = bwArr.bodyweight;
@@ -100,7 +104,7 @@
           trainingUser = 'Caj'
           break;
         default:
-          console.log(`Sorry, we are out of ${trainingArr.uid}.`);
+          console.log(`Sorry, we are out of UID ${trainingArr.uid}.`);
       }
     }
     return {
@@ -121,7 +125,7 @@
       proteinTot: proteinTot,
       carbsTot: carbsTot,
       fatsTot: fatsTot,
-      daysCompleted: daysCompleted,
+      daysCompleted: daysCompleted, //How many days in a week are completed, completed is defined as tracking calories for a day.
     }
   });
 
@@ -129,8 +133,8 @@
   function weeklyRecap(date) {
 
     let today = new Date(date);
-    const week = [];
-    const weekFormatted = [];
+    const week: Date[] = [];
+    const weekFormatted: Date[] = [];
     let calories = 0;
     let protein = 0;
     let carbs = 0;
@@ -148,39 +152,39 @@
     }
 
     //filter all 7 days into correct format
-    for (let i = 0; i < week.length; i++) {
-      weekFormatted.push(formatDate(week[i]));
-    }
+    week.forEach(element => {
+      weekFormatted.push(formatDate(element));
+    });
 
     //get all the dates from caloriesData(supabase) that match the 7 days
     const filteredUID = caloriesData.filter(item => item.uid === uid);
-    const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at));
+    const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at)); //Coercion
 
     //Length check
     daysCompleted = matchingDates.length;
     
     //extract calories, protein, carbs, fats from them
-    for (let i = 0; i < matchingDates.length; i++) {
-      calories += matchingDates[i].calories;
-      protein += matchingDates[i].protein;
-      carbs += matchingDates[i].carbs;
-      fats += matchingDates[i].fats;
-    }
+    matchingDates.forEach(element => {
+      calories += element.calories;
+      protein += element.protein;
+      carbs += element.carbs;
+      fats += element.fats;
+    });
     return {calories, protein, carbs, fats, daysCompleted};
   }
 
   // First
   function addRecapToCalories() {
-    let mondayList = [];
+    let mondayList: caloriesType[] = [];
     //First filter calories table for uid
     const filteredUID = caloriesData.filter(item => item.uid === uid);
 
     //Then get every object that is a monday
-    for (let i = 0; i < filteredUID.length; i++) {
-      if(isMonday(filteredUID[i].created_at)){
-        mondayList.push(filteredUID[i]);
+    filteredUID.forEach(element => {
+      if(isMonday(element.created_at)){
+        mondayList.push(element);
       }
-    }
+    });
 
     //start with first monday and go forward 6 days to calculcate average
     mondayList.forEach(element => {      
@@ -192,8 +196,7 @@
       element.daysCompleted = recap.daysCompleted;
     });
 
-    //when you have total for that week, merge with original calorie table
-
+    //when you have total for that week, merge with original calorie table, USELESS?
     /*
     const additionalDataMap = new Map(mondayList.map(item => [`${item.id}-${item.created_at}`, item]));
     caloriesData.forEach(item => {
@@ -210,7 +213,7 @@
   addRecapToCalories();
 
   //Format to 2024-01-01 format
-  function formatDate(date) {
+  function formatDate(date:Date) {
     const year = date.getFullYear();
     const month = date.getMonth() + 1; // getMonth() returns 0-11, add 1 for 1-12
     const day = date.getDate();
@@ -270,7 +273,7 @@
   }
   
   onMount(async () => {
-		console.log('DAYS ARRAY',daysArray);
+		//console.log('DAYS ARRAY',daysArray);
 	});
   
 </script>

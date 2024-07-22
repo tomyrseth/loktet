@@ -51,10 +51,10 @@
     exercise_id = ex_obj.id;
   }
 
-  for (let i = 0; i < liftsData.length; i++) {
-    arr.push(liftsData[i].exercise_id);
+  liftsData.forEach(element =>{
+    arr.push(element.exercise_id);
     exercise_id_list = [...new Set(arr)];
-  }
+  });
 
   //Find exercise name based on id
   function findExName (id:number){
