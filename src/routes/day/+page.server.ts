@@ -39,7 +39,6 @@ export const actions: Actions = {
     ]);
 
     if (!error) {
-      location.reload();
       return { success: true , data: data}
     }
     throw new Error(error.message);
@@ -57,7 +56,6 @@ export const actions: Actions = {
     .insert({ uid: uid, created_at: today, bodyweight: bw });
 
     if (!error) {
-      location.reload();
       return { success: true , data: data}
     }
     throw new Error(error.message);
@@ -79,7 +77,6 @@ export const actions: Actions = {
     ]);
 
     if (!error) {
-      location.reload();
       return { success: true , data: data}
     }
     throw new Error(error.message);
@@ -105,7 +102,6 @@ export const actions: Actions = {
     ]);
 
     if (!error) {
-      location.reload();
       return { success: true , data: data}
     }
     throw new Error(error.message);
