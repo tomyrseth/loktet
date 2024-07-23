@@ -171,7 +171,7 @@
           return async ({ result }) => {
             if (result.type === 'success') {
               console.log('lift submission success', liftsData);
-              //location.reload();
+              location.reload();
             } else {
               console.log('lift submission failed')
             }
