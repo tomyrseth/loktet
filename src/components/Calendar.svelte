@@ -51,7 +51,7 @@
   $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
     let trainingUser = '', trainingName = ''
     let day_id = 0;
-    let calories = undefined, protein = undefined, carbs = undefined, fats = undefined, bw = undefined, calorieTot = undefined, proteinTot = undefined, carbsTot = undefined, fatsTot = undefined, type = undefined, amount = undefined, daysCompleted = undefined;
+    let calories, protein, carbs, fats, bw, calorieTot, proteinTot, carbsTot, fatsTot, type, amount, daysCompleted = null;
 
 
     let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
