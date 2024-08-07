@@ -12,6 +12,7 @@
   export let dietPlanTable: Tables<'diet_plan'>[] | undefined;
   export let uid = 0;
 
+
   type userCaloriesExtended = {
     calories: number,
     carbs: number,
