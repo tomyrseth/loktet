@@ -227,8 +227,7 @@
 
     mondayWeeks.forEach((week) => {
       let matchingDates = getMatchingUserDates(week)
-      console.log("🚀 ~ mondayWeeks.forEach ~ matchingDates:", matchingDates)
-      
+
       getInfoFromMatchedDates(matchingDates);
 
     });
