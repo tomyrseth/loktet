@@ -229,7 +229,8 @@
     mondayWeeks.forEach((week) => {
       let matchingDates = getMatchingUserDates(week)
 
-      getInfoFromMatchedDates(matchingDates);
+      let info = getInfoFromMatchedDates(matchingDates);
+      caloriesTable.calorieTot = info.calorieTot;
 
     });
     //let matchingDates = getMatchingUserDates(mondayWeeks);
