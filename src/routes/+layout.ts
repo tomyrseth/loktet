@@ -1,4 +1,6 @@
-import { supabase } from "$lib/supabaseClient";
+/*
+import { supabase } from "$lib/db/index.js";
+import { error } from "@sveltejs/kit";
 
 export async function load({ fetch, params }) {
   const exerciseRes = await supabase.from('exercises').select()
@@ -84,5 +86,5 @@ export async function load({ fetch, params }) {
     exerciseRes, daysRes, usersRes, bwRes, caloriesRes, dietPlanRes
   };
 }
-
+*/
 

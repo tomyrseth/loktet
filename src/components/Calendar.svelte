@@ -3,139 +3,291 @@
   import { goto } from '$app/navigation';
   import { toast } from '@zerodevx/svelte-toast'
   import Modal from '../components/Modal.svelte';
-  import type { Database } from '$lib/types/supabase';
+  import type { Database, Tables } from '$lib/db/database.types';
 
-  type daysType = [Database['public']['Tables']['days']['Row']]
-  type bwType = [Database['public']['Tables']['bodyweight']['Row']]
-  type caloriesType = [Database['public']['Tables']['calories']['Row']]
-  type dietPlanType = [Database['public']['Tables']['diet_plan']['Row']]
-  
 
-  export let daysData :daysType;
-  export let bwData :bwType;
-  export let caloriesData :caloriesType;
-  export let dietPlanData :dietPlanType;
-  
+  export let daysTable: Tables<'days'>[] | undefined;
+  export let bwTable: Tables<'bodyweight'>[] | undefined;
+  export let caloriesTable: userCaloriesExtended[];
+  export let dietPlanTable: Tables<'diet_plan'>[] | undefined;
   export let uid = 0;
 
+  type userCaloriesExtended = {
+    calories: number,
+    carbs: number,
+    created_at: string,
+    fats: number,
+    id: number,
+    protein: number,
+    uid: number,
+    //extended
+    calorieTot: number,
+    proteinTot: number,
+    carbsTot: number,
+    fatsTot: number,
+    daysCompleted: number,
+  }
+
   let dialog; // ANY type, TODO make a type for this
-  let day_name = '';
+  let dayName = '', name = '', type = '';
+  let dayId = 0;
+  let trainingName: string|null = ''
+  let calories: number|null = 0
+  let protein: number|null = 0
+  let carbs: number|null = 0
+  let fats: number|null = 0
+  let bw: number|null = 0
+  let calorieGoal: number|null = 0
+  let calorieTot = 0, proteinTot = 0, carbsTot = 0, fatsTot = 0, daysCompleted = 0;
+
+  //TODO: rename these, f.ex dailyBw
+  let userDays: Tables<'days'> | undefined;
+  let userCalories: userCaloriesExtended | undefined;
+  let userBw: Tables<'bodyweight'> | undefined;
+  let userDietPlan: Tables<'diet_plan'>[] | undefined;
+
   let currentClickedDay:object;
 
   let now = new Date();
-  let nowMonth = now.getMonth()+1; //+1 because it starts from 0, I want it to start from 1
+  let currentMonth = now.getMonth();
 
-  let currentDate = new Date();
-  let currentMonth = currentDate.getMonth(); 
-  let currentYear = currentDate.getFullYear();
-  let daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-  let firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+  let calendarDate = new Date();
+  let calendarMonth = calendarDate.getMonth(); 
+  let calendarYear = calendarDate.getFullYear();
+  let daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+  let firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
+
+  
   $: adjustedFirstDayOfMonth = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-
-  $: monthName = currentDate.toLocaleString('se', { month: 'long' });
+  $: monthName = calendarDate.toLocaleString('se', { month: 'long' });
   $: monthnameCapitalized = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   $: emptyStartDays = Array.from({ length: adjustedFirstDayOfMonth });
-    
+
   // Highlight today
   $: isToday = (date:string) => {
-    return (date === currentYear.toString()+'-'+ (((nowMonth).toString().length<2) ? (nowMonth).toString().padStart(2, '0') : (nowMonth).toString())+'-'+((now.getDate().toString().length<2) ? now.getDate().toString().padStart(2, '0') : now.getDate().toString()));
+    return (date === formatDate(new Date(calendarYear, currentMonth, now.getDate())))
   };
 
   /*
   daysArray: largest datapoint in the application, it's a reactive (declared by $:) array of objects, each individual day on the calendar is a object of daysArray.
-
-  Because currentMonth variable starts from 0, january is counted as 0, therefore +1 has to be added to every mention of currentMonth.
-  Can't assign currentMonth+1 either because it wouldnt be reactive, and '$: currentMonth = ...+1' doesn't work properly.
   This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
   */ 
   $: daysArray = Array.from({ length: daysInMonth }, (_, i) => {
-    let trainingUser = '', trainingName = ''
-    let day_id = 0;
-    let calories, protein, carbs, fats, bw, calorieTot, proteinTot, carbsTot, fatsTot, type, amount, daysCompleted = null;
 
+    calories = 0, 
+    protein = 0, 
+    carbs = 0, 
+    fats = 0;
+    calorieTot = 0, 
+    proteinTot = 0, 
+    carbsTot = 0, 
+    fatsTot = 0
+    calorieGoal = 0;
+    daysCompleted = 0;
+    bw = 0;
 
-    let date = currentYear.toString()+'-'+ (((currentMonth+1).toString().length<2) ? (currentMonth+1).toString().padStart(2, '0') : (currentMonth+1).toString())+'-'+(((i+1).toString().length<2) ? (i+1).toString().padStart(2, '0') : (i+1).toString());
+    let date = formatDate(new Date(calendarYear, calendarMonth, i+1));
+    
+    //Diet plan is only needed on Monday objects, because monday is weekly recap
+    if (isMonday(date)) doesDayHaveDietPlan(dietPlanTable, date); 
 
-    //Get all the data from supabase for the specific user
-    let trainingArr = daysData.find(item => item.created_at === date && item.uid === uid);
-    let caloriesArr = caloriesData.find(item => item.created_at === date && item.uid === uid);
-    let bwArr = bwData.find(item => item.created_at === date && item.uid === uid);
-    let dietPlanArr = dietPlanData.filter(item => item.uid === uid);
+    filterTodaysData(date);
+    doesDayHaveCalories(userCalories);
+    doesDayHaveBw(userBw);
+    doesDayHaveTraining(userDays);
 
-    if (caloriesArr){
-      calories = caloriesArr.calories;
-      protein = caloriesArr.protein;
-      carbs = caloriesArr.carbs;
-      fats = caloriesArr.fats;
-
-      // Below variables extend current calorie table from supabase
-      calorieTot = caloriesArr.calorieTot;
-      proteinTot = caloriesArr.proteinTot;
-      carbsTot = caloriesArr.carbsTot;
-      fatsTot = caloriesArr.fatsTot;
-      daysCompleted = caloriesArr.daysCompleted;
-    }
-    if (bwArr){
-      bw = bwArr.bodyweight;
-    }
-
-    if (dietPlanArr){
-      // Sort objects by id in descending order
-      dietPlanArr.sort((a, b) => b.id - a.id);
-      // Find the first upcoming date
-      const result = dietPlanArr.find(item => new Date(item.created_at) < new Date(date));
-      // Handle the case where no future date is found
-      if (result){
-        type = result.type;
-        amount = result.amount;
-      }
-    }
-      
-    if (trainingArr){
-      trainingName = trainingArr.name;
-      day_id = trainingArr.id;
-      switch (trainingArr.uid) {
-        case 1:
-          trainingUser = 'Tom'
-          break;
-        case 2:
-          trainingUser = 'Saab'
-          break;
-        case 3:
-          trainingUser = 'Caj'
-          break;
-        default:
-          console.log(`Sorry, we are out of UID ${trainingArr.uid}.`);
-      }
-
-    }
     return {
-      user_id: uid,
-      name: trainingUser,
-      date: date,
-      hasTraining: !!trainingArr,
+      uid,
+      name,
+      date,
+      hasTraining: !!userDays,
       dayName: trainingName,
-      day_id : day_id,
-      calories: calories,
-      protein: protein,
-      carbs: carbs,
-      fats: fats,
-      bw: bw,
-      type: type, //Bulking, Cutting or Maintaining.
-      amount: amount,
-      calorieTot: calorieTot,
-      proteinTot: proteinTot,
-      carbsTot: carbsTot,
-      fatsTot: fatsTot,
-      daysCompleted: daysCompleted, //How many days in a week are completed, completed is defined as tracking calories for a day.
+      dayId,
+      calories,
+      protein,
+      carbs,
+      fats,
+      bw,
+      type, //Bulking, Cutting or Maintaining.
+      calorieGoal,
+      calorieTot,
+      proteinTot,
+      carbsTot,
+      fatsTot,
+      daysCompleted, //How many days in a week are completed, completed is defined as tracking calories for a day.
     }
   });
 
-  // Second
-  function weeklyRecap(date) {
+  function filterTodaysData(date:string) {
+    //filter tables for this specific day
+    userDays = daysTable?.find(item => item.created_at === date);
+    userCalories = caloriesTable?.find(item => item.created_at === date);
+    userBw = bwTable?.find(item => item.created_at === date);
+  }
+  
+  function doesDayHaveCalories (userCalories:userCaloriesExtended | undefined) {
+    if (userCalories) defineCalories(userCalories);
+  }
 
-    let today = new Date(date);
+  function defineCalories(userCalories:userCaloriesExtended) {
+    calories = userCalories.calories;
+    protein = userCalories.protein;
+    carbs = userCalories.carbs;
+    fats = userCalories.fats;
+
+    // Below variables extend current calorie table from supabase
+    calorieTot = userCalories.calorieTot;
+    proteinTot = userCalories.proteinTot;
+    carbsTot = userCalories.carbsTot;
+    fatsTot = userCalories.fatsTot;
+    daysCompleted = userCalories.daysCompleted;
+  }
+
+  function doesDayHaveBw(userBw:Tables<'bodyweight'> | undefined) {
+    if (userBw) bw = userBw.bodyweight;
+  }
+
+  function doesDayHaveDietPlan(dietPlanTable:Tables<'diet_plan'>[] = [], date:string) {
+    if (dietPlanTable) determineCurrentDietPlan(dietPlanTable, date);
+  }
+
+  function determineCurrentDietPlan (dietPlanTable:Tables<'diet_plan'>[] = [], date:string) {
+    // Sort objects by id in descending order
+    dietPlanTable.sort((first, second) => second.id - first.id);
+    // Find the first upcoming date
+    const result = dietPlanTable.find(item => new Date(item.created_at) < new Date(date));
+    // Handle the case where no future date is found
+    if (result){
+      type = result.type;
+      calorieGoal = result.calorieGoal;
+    }
+  }
+
+  function doesDayHaveTraining(userDays:Tables<'days'> | undefined) {
+    if (userDays) determineUsername(userDays);
+  }
+
+  function determineUsername(userDays:Tables<'days'> | undefined) {
+    trainingName = userDays.name;
+    dayId = userDays.id;
+    switch (userDays.uid) {
+      case 1:
+        name = 'Tom'
+        break;
+      case 2:
+        name = 'Saab'
+        break;
+      case 3:
+        name = 'Caj'
+        break;
+      default:
+        console.log(`Sorry, we are out of UID ${userDays.uid}.`);
+      }
+  }
+
+
+  
+  // function finalizeRecap(mondayArray) {
+  //   mondayArray.forEach(element => {      
+  //     let recap = weeklyRecap(element.created_at);
+  //     element.calorieTot = recap.calories;
+  //     element.proteinTot = recap.protein;
+  //     element.carbsTot = recap.carbs;
+  //     element.fatsTot = recap.fats;
+  //     element.daysCompleted = recap.daysCompleted;
+  //   });
+  // }
+
+
+  function getInfoFromMatchedDates(matchingDates:userCaloriesExtended[]){
+    let calories = 0;
+    let protein = 0;
+    let carbs = 0;
+    let fats = 0;
+    let daysCompleted = 0;
+
+    daysCompleted = matchingDates.length;
+    //extract calories, protein, carbs, fats from them
+    matchingDates.forEach(object => {
+      calories += object.calories;
+      protein += object.protein;
+      carbs += object.carbs;
+      fats += object.fats;
+    });
+      return {calories, protein, carbs, fats, daysCompleted};
+    }
+
+
+  weeklyRecapFunctionCaller();
+
+  function weeklyRecapFunctionCaller() {
+
+    let mondayArray = getMondayCalorieDays();
+    let mondayWeeks = generateWeeksFromMondays(mondayArray);
+
+    mondayWeeks.forEach((week) => {
+      let matchingDates = getMatchingUserDates(week)
+      console.log("🚀 ~ mondayWeeks.forEach ~ matchingDates:", matchingDates)
+      
+      getInfoFromMatchedDates(matchingDates);
+
+    });
+    //let matchingDates = getMatchingUserDates(mondayWeeks);
+    //getInfoFromMatchedDates(matchingDates)
+    //finalizeRecap(mondayArray)
+  }
+
+  function getMondayCalorieDays () {
+    //Get every object that is a monday
+    let mondayArray = caloriesTable?.filter(date => isMonday(date.created_at));
+    //!array.length returns true if array is empty, false else
+    if (!mondayArray.length) {
+      console.log('function getMondayCalorieDays, parameter array is empty!', arr);
+      return [];
+    }
+    return mondayArray;
+  }
+
+  function generateWeeksFromMondays(mondayArray:userCaloriesExtended[]){
+    let weekArray:String[][] = []
+    mondayArray.forEach((element) => {
+      let week = createWeek(element.created_at);
+      weekArray.push(week);
+    });
+    return weekArray;
+  }
+
+  function createWeek(mondayDate:String){
+    //Put this weeks dates in an array
     const week: Date[] = [];
+    let weekFormatted:String[] = [];
+    const weekLength = 7;
+    let today = new Date(mondayDate);
+    let weekDayIterator = 0; //Monday when this is 0
+    
+    for (let i = 0; i < weekLength; i++) {
+      let iteratedDate = today.setDate(today.getDate() +weekDayIterator);
+      week.push(new Date(iteratedDate));
+      if (weekDayIterator === 0) weekDayIterator += 1;
+    }
+    if (week.length !== 7) new Error('Week length is not 7');
+    week.forEach(date => weekFormatted.push(formatDate(date)));
+    return weekFormatted;
+  }
+
+  function getMatchingUserDates(mondayWeeks:String[]) {
+    let matchingDates: userCaloriesExtended[] = [];
+    matchingDates = caloriesTable.filter(item => mondayWeeks.includes(item.created_at)); //Coercion
+    //!array.length returns true if array is empty, false else
+    if (!matchingDates.length){
+      return [];
+    }
+    return matchingDates;
+  }
+
+
+  function weeklyRecap(mondayDate:String) {
+ 
     const weekFormatted: Date[] = [];
     let calories = 0;
     let protein = 0;
@@ -143,25 +295,18 @@
     let fats = 0;
     let daysCompleted = 0;
 
-    //put all next 6 days in an array
-    let k = 0;
-    for (let i = 0; i < 7; i++) {
-      let temp = today.setDate(today.getDate() +k);
-      week.push(new Date(temp));
-      if (k === 0){
-        k = k+1;
-      }
-    }
+
+    let week = createWeek(mondayDate);
+
     //filter all 7 days into correct format
     week.forEach(element => {
       weekFormatted.push(formatDate(element));
     });
 
-    //get all the dates from caloriesData(supabase) that match the 7 days
-    const filteredUID = caloriesData.filter(item => item.uid === uid);
-    const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at)); //Coercion
+    //get all the dates from caloriesTable(supabase) that match the 7 days
+    const matchingDates = caloriesTable.filter(item => weekFormatted.includes(item.created_at)); //Coercion
 
-    //Length check
+    //define daysCompleted for calculations
     daysCompleted = matchingDates.length;
     
     //extract calories, protein, carbs, fats from them
@@ -174,47 +319,18 @@
     return {calories, protein, carbs, fats, daysCompleted};
   }
 
-  // First
-  function addRecapToCalories() {
-    let mondayList: caloriesType[] = [];
-    //First filter calories table for uid
-    const filteredUID = caloriesData.filter(item => item.uid === uid);
-
-    //Then get every object that is a monday
-    filteredUID.forEach(element => {
-      if(isMonday(element.created_at)){
-        mondayList.push(element);
-      }
-    });
-
-    //start with first monday and go forward 6 days to calculcate average
-    mondayList.forEach(element => {      
-      let recap = weeklyRecap(element.created_at);
-      element.calorieTot = recap.calories;
-      element.proteinTot = recap.protein;
-      element.carbsTot = recap.carbs;
-      element.fatsTot = recap.fats;
-      element.daysCompleted = recap.daysCompleted;
-    });
-
-    //when you have total for that week, merge with original calorie table, USELESS?
-    /*
-    const additionalDataMap = new Map(mondayList.map(item => [`${item.id}-${item.created_at}`, item]));
-    caloriesData.forEach(item => {
-
-      const key = `${item.id}-${item.created_at}`;
-      if (additionalDataMap.has(key)) {
-        Object.assign(item, additionalDataMap.get(key));
-      }
-    });
-    console.log(caloriesData,'after')
-    */
-
+  //Navigate calendar
+  function navigateMonths(step:number) {
+    calendarDate = new Date(calendarYear, calendarMonth + step, 1);
+    calendarMonth = calendarDate.getMonth();
+    calendarYear = calendarDate.getFullYear();
+    daysInMonth = new Date(calendarYear, calendarMonth + 1, 0).getDate();
+    firstDayOfMonth = new Date(calendarYear, calendarMonth, 1).getDay();
   }
-  addRecapToCalories();
 
   //Format to 2024-01-01 format
-  function formatDate(date:Date) {
+  function formatDate(date:Date) {    
+    
     const year = date.getFullYear();
     const month = date.getMonth() + 1; // getMonth() returns 0-11, add 1 for 1-12
     const day = date.getDate();
@@ -225,9 +341,9 @@
     return `${year}-${formattedMonth}-${formattedDay}`;
   }
 
-  function openDayPage(day_id:number, user_id:number, hasTraining:boolean, day){
+  function openDayPage(dayId:number, uid:number, hasTraining:boolean, day){
     if (hasTraining) {
-      goto(`/day/?day_id=${day_id}&user_id=${user_id}`);
+      goto(`/day/?dayId=${dayId}&uid=${uid}`);
 	  }
     else if (!hasTraining) {
       dialog.showModal()
@@ -236,29 +352,20 @@
   }
 
   function isMonday(date) {
-    let temp = new Date(date);
+    let temp = new Date(date);    
     return temp.getDay() === 1;
-  }
-
-  //Navigate calendar
-  function navigateMonths(step:number) {
-    currentDate = new Date(currentYear, currentMonth + step, 1);
-    currentMonth = currentDate.getMonth();
-    currentYear = currentDate.getFullYear();
-    daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-    firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
   }
 
   //BACKEND
   async function submitData() {
-    if (day_name.length > 13) {
+    if (dayName.length > 13) {
       alert('Day name too long! Max 13 chars.')
       return 0;
     }
     const response = await fetch('/api/addDay', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ uid, day_name , currentClickedDay})
+      body: JSON.stringify({ uid, dayName , currentClickedDay})
     });
 
     if (response.ok) {
@@ -274,7 +381,7 @@
   }
   
   onMount(async () => {
-		//console.log('DAYS ARRAY',daysArray);
+    //console.log('daysTable: ', daysArray);
 	});
   
 </script>
@@ -282,7 +389,7 @@
 <div class="calendar">
   <div class="header">
     <div></div>
-    <span class='monthName'>{monthnameCapitalized} {currentYear}</span>
+    <span class='monthName'>{monthnameCapitalized} {calendarYear}</span>
     <div>
       <button on:click={() => navigateMonths(-1)} class="calendarNav">&lt;</button>
       <button on:click={() => navigateMonths(1)} class="calendarNav">&gt;</button>
@@ -302,7 +409,7 @@
 
   {#each daysArray as day}
   <button class= 'dayContainer' class:currentDayContainer={isToday(day.date)} 
-    on:click={() => openDayPage(day.day_id, day.user_id, day.hasTraining, day)}
+    on:click={() => openDayPage(day.dayId, day.uid, day.hasTraining, day)}
   >
     <span class="weekDay">
       <span class="dayNumber">{day.date.slice(-2)}</span>
@@ -327,8 +434,8 @@
       {#if day.calorieTot && day.type}
         <span class='test'>
           <span class='bodyweight'>{day.type}</span>
-          <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='bodyweight'> {Math.trunc(day.calorieTot/day.daysCompleted)} / {Math.trunc(day.amount/day.daysCompleted)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='bodyweight'>{day.calorieTot} / {day.calorieGoal} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='bodyweight'> {Math.trunc(day.calorieTot/day.daysCompleted)} / {Math.trunc(day.calorieGoal/day.daysCompleted)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
           <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
           <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
           <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
@@ -336,7 +443,7 @@
 
         {#if day.daysCompleted != 7 && day.calorieTot}
           <span class='test2'>
-            <span class='bodyweight'> {(day.amount-day.calorieTot)/(7-day.daysCompleted)} per day to reach calorie goal</span>
+            <span class='bodyweight'> {(day.calorieGoal-day.calorieTot)/(7-day.daysCompleted)} per day to reach calorie goal</span>
           </span>
         {/if}
           
@@ -354,7 +461,7 @@
     <h1 style='color: white'>Day log</h1>
 
     <label for="" style='color: white; padding-bottom: 1em'>Name your day</label>
-    <input type="text" bind:value={day_name}>
+    <input type="text" bind:value={dayName}>
 
     <button on:click="{submitData}">Submit</button>
   </div>

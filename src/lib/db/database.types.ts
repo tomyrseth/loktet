@@ -133,21 +133,21 @@ export type Database = {
       }
       diet_plan: {
         Row: {
-          amount: number | null
+          calorieGoal: number | null
           created_at: string
           id: number
           type: string
           uid: number
         }
         Insert: {
-          amount?: number | null
+          calorieGoal?: number | null
           created_at: string
           id?: number
           type: string
           uid: number
         }
         Update: {
-          amount?: number | null
+          calorieGoal?: number | null
           created_at?: string
           id?: number
           type?: string
@@ -237,35 +237,6 @@ export type Database = {
           program_name?: string | null
         }
         Relationships: []
-      }
-      protein: {
-        Row: {
-          amount: number | null
-          created_at: string
-          id: number
-          uid: number | null
-        }
-        Insert: {
-          amount?: number | null
-          created_at: string
-          id?: number
-          uid?: number | null
-        }
-        Update: {
-          amount?: number | null
-          created_at?: string
-          id?: number
-          uid?: number | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "public_protein_uid_fkey"
-            columns: ["uid"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       users: {
         Row: {

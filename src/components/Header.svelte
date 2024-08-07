@@ -13,13 +13,13 @@
 			<li aria-current={$page.url.pathname === '/' ? 'page' : undefined}>
 				<a href="/">Home</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/tom' ? 'page' : undefined}>
-				<a href="/tom">Tom</a>
+			<li aria-current={$page.url.pathname === '/user/tom' ? 'page' : undefined}>
+				<a href="/user/tom">Tom</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/saab' ? 'page' : undefined}>
+			<li aria-current={$page.url.pathname === '/user/saab' ? 'page' : undefined}>
 				<a href="/saab">Saab</a>
 			</li>
-			<li aria-current={$page.url.pathname === '/caj' ? 'page' : undefined}>
+			<li aria-current={$page.url.pathname === '/user/caj' ? 'page' : undefined}>
 				<a href="/caj">Caj</a>
 			</li>
 		</ul>

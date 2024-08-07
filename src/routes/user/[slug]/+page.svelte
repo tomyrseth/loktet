@@ -1,27 +1,28 @@
 <script lang='ts'>
-	import Calendar from "../../components/Calendar.svelte"
+	import Calendar from "../../../components/Calendar.svelte"
   import { type Database } from "$lib/db/database.types";
-	export let data:Database;
+  import type { PageData } from "../../$types";
+	import { userData } from "../../../stores";
 
+	export let data;
+	
+	const uid = 1; //Tom
 
-	const daysData = data.daysRes.data;
-	const bwData = data.bwRes.data;
-	const caloriesData = data.caloriesRes.data;
-	const dietPlanData = data.dietPlanRes.data;
+	$userData = data;
 
-	const uid = 3; //Caj
+	console.log($userData);
 
 </script>
 
 <svelte:head>
-	<title>Caj</title>
+	<title>Tom</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
 
 <div class="mainContainer">
 	
 	<div class="calendar">
-			<Calendar {daysData} {bwData} {caloriesData} {uid} {dietPlanData}/>
+			<!-- <Calendar {daysTable} {bwTable} {caloriesTable} {dietPlanTable} {uid}/> -->
 	</div>
 </div>
 

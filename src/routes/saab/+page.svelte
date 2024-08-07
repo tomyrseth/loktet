@@ -1,7 +1,6 @@
 <script lang='ts'>
 	import Calendar from "../../components/Calendar.svelte"
 	import Modal from '../../components/Modal.svelte';
-	export let data;
 	let showModal = false;
 	let dateSelected = '';
 	let calorieGoal = 0;
@@ -9,15 +8,17 @@
 	let dialog;
 	let plan = ['Cutting', 'Bulking', 'Maintenance']
 
-	const daysData = data.daysRes.data;
-	const bwData = data.bwRes.data;
-	const caloriesData = data.caloriesRes.data;
-	const dietPlanData = data.dietPlanRes.data;
-  
-	const uid = 2; //SAAB
+	export let data;
+	
+	const daysTable = data.daysResponse?.data;
+	const bwTable = data.bwResponse?.data;
+	const caloriesTable = data.caloriesResponse?.data;
+	const dietPlanTable = data.dietPlanResponse?.data;
+
+
+	const uid = 2; //Saab
 
 	async function submitData() {
-		console.log(cbm);
     const response = await fetch('/api/addDietPlan', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -40,7 +41,7 @@
 </svelte:head>
 <div class="main-container">
   <div class="calendar">
-    <Calendar {daysData} {bwData} {uid} {caloriesData} {dietPlanData}/>
+		<Calendar {daysTable} {bwTable} {caloriesTable} {uid} {dietPlanTable} {data}/>
   </div>
 
 	<Modal bind:dialog>

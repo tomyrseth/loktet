@@ -27,10 +27,10 @@
   const day_id = url.searchParams.get('day_id');
 
   let liftsData = data.data;
-  let exerciseData = data.exerciseRes?.data;
-  let daysData = data.daysRes?.data;
-  let bwData = data.bwRes?.data;
-  let caloriesData = data.caloriesRes?.data;
+  let exerciseData = data.exerciseResponse?.data;
+  let daysData = data.daysResponse?.data;
+  let bwData = data.bwResponse?.data;
+  let caloriesData = data.caloriesResponse?.data;
 
   let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
   $: console.log(liftShow);
