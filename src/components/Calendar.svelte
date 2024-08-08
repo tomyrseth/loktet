@@ -9,7 +9,7 @@
   type bwType = [Database['public']['Tables']['bodyweight']['Row']]
   type caloriesType = [Database['public']['Tables']['calories']['Row']]
   type dietPlanType = [Database['public']['Tables']['diet_plan']['Row']]
-  
+    
 
   export let daysData :daysType;
   export let bwData :bwType;
