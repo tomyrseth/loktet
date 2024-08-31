@@ -8,12 +8,11 @@
 
   export let daysTable: Tables<'days'>[] | undefined;
   export let bwTable: Tables<'bodyweight'>[] | undefined;
-  export let caloriesTable: userCaloriesExtended[];
+  export let caloriesTable: dailyCaloriesExtended[];
   export let dietPlanTable: Tables<'diet_plan'>[] | undefined;
   export let uid = 0;
 
-
-  type userCaloriesExtended = {
+  type dailyCaloriesExtended = {
     calories: number,
     carbs: number,
     created_at: string,
@@ -41,11 +40,10 @@
   let calorieGoal: number|null = 0
   let calorieTot = 0, proteinTot = 0, carbsTot = 0, fatsTot = 0, daysCompleted = 0;
 
-  //TODO: rename these, f.ex dailyBw
-  let userDays: Tables<'days'> | undefined;
-  let userCalories: userCaloriesExtended | undefined;
-  let userBw: Tables<'bodyweight'> | undefined;
-  let userDietPlan: Tables<'diet_plan'>[] | undefined;
+  let dailyDays: Tables<'days'> | undefined;
+  let dailyCalories: dailyCaloriesExtended | undefined;
+  let dailyBw: Tables<'bodyweight'> | undefined;
+  let dailyDietPlan: Tables<'diet_plan'>[] | undefined;
 
   let currentClickedDay:object;
 
@@ -68,7 +66,6 @@
   $: isToday = (date:string) => {
     return (date === formatDate(new Date(calendarYear, currentMonth, now.getDate())))
   };
-
   /*
   daysArray: largest datapoint in the application, it's a reactive (declared by $:) array of objects, each individual day on the calendar is a object of daysArray.
   This creates an array of objects from all the days in the month, and assigns each day its full date, ex: '2024-01-01' along with all the info needed to be displayed.
@@ -89,19 +86,20 @@
 
     let date = formatDate(new Date(calendarYear, calendarMonth, i+1));
     
+    filterTablesForThisDay(date);
+    
     //Diet plan is only needed on Monday objects, because monday is weekly recap
-    if (isMonday(date)) doesDayHaveDietPlan(dietPlanTable, date); 
+    if (dietPlanTable && isMonday(date)) determineCurrentDietPlan(dietPlanTable, date);
 
-    filterTodaysData(date);
-    doesDayHaveCalories(userCalories);
-    doesDayHaveBw(userBw);
-    doesDayHaveTraining(userDays);
+    if (dailyCalories) defineCalories(dailyCalories);
+    if (dailyDays) determineUsername(dailyDays);
+    if (dailyBw) bw = dailyBw.bodyweight;
 
     return {
       uid,
       name,
       date,
-      hasTraining: !!userDays,
+      hasTraining: !!dailyDays,
       dayName: trainingName,
       dayId,
       calories,
@@ -118,38 +116,12 @@
       daysCompleted, //How many days in a week are completed, completed is defined as tracking calories for a day.
     }
   });
-
-  function filterTodaysData(date:string) {
-    //filter tables for this specific day
-    userDays = daysTable?.find(item => item.created_at === date);
-    userCalories = caloriesTable?.find(item => item.created_at === date);
-    userBw = bwTable?.find(item => item.created_at === date);
-  }
   
-  function doesDayHaveCalories (userCalories:userCaloriesExtended | undefined) {
-    if (userCalories) defineCalories(userCalories);
-  }
-
-  function defineCalories(userCalories:userCaloriesExtended) {
-    calories = userCalories.calories;
-    protein = userCalories.protein;
-    carbs = userCalories.carbs;
-    fats = userCalories.fats;
-
-    // Below variables extend current calorie table from supabase
-    calorieTot = userCalories.calorieTot;
-    proteinTot = userCalories.proteinTot;
-    carbsTot = userCalories.carbsTot;
-    fatsTot = userCalories.fatsTot;
-    daysCompleted = userCalories.daysCompleted;
-  }
-
-  function doesDayHaveBw(userBw:Tables<'bodyweight'> | undefined) {
-    if (userBw) bw = userBw.bodyweight;
-  }
-
-  function doesDayHaveDietPlan(dietPlanTable:Tables<'diet_plan'>[] = [], date:string) {
-    if (dietPlanTable) determineCurrentDietPlan(dietPlanTable, date);
+  function filterTablesForThisDay(date:string) {
+    //filter tables for this specific day
+    dailyDays = daysTable?.find(item => item.created_at === date);
+    dailyCalories = caloriesTable?.find(item => item.created_at === date);
+    dailyBw = bwTable?.find(item => item.created_at === date);
   }
 
   function determineCurrentDietPlan (dietPlanTable:Tables<'diet_plan'>[] = [], date:string) {
@@ -163,15 +135,26 @@
       calorieGoal = result.calorieGoal;
     }
   }
+  
+  function defineCalories(dailyCalories:dailyCaloriesExtended) {
+    calories = dailyCalories.calories;
+    protein = dailyCalories.protein;
+    carbs = dailyCalories.carbs;
+    fats = dailyCalories.fats;
 
-  function doesDayHaveTraining(userDays:Tables<'days'> | undefined) {
-    if (userDays) determineUsername(userDays);
+    // Below variables extend current calorie table from supabase
+    calorieTot = dailyCalories.calorieTot;
+    proteinTot = dailyCalories.proteinTot;
+    carbsTot = dailyCalories.carbsTot;
+    fatsTot = dailyCalories.fatsTot;
+    daysCompleted = dailyCalories.daysCompleted;
   }
 
-  function determineUsername(userDays:Tables<'days'> | undefined) {
-    trainingName = userDays.name;
-    dayId = userDays.id;
-    switch (userDays.uid) {
+
+  function determineUsername(dailyDays:Tables<'days'> | undefined) {
+    trainingName = dailyDays.name;
+    dayId = dailyDays.id;
+    switch (dailyDays.uid) {
       case 1:
         name = 'Tom'
         break;
@@ -182,25 +165,12 @@
         name = 'Caj'
         break;
       default:
-        console.log(`Sorry, we are out of UID ${userDays.uid}.`);
+        console.log(`Sorry, we are out of UID ${dailyDays.uid}.`);
       }
   }
 
 
-  
-  // function finalizeRecap(mondayArray) {
-  //   mondayArray.forEach(element => {      
-  //     let recap = weeklyRecap(element.created_at);
-  //     element.calorieTot = recap.calories;
-  //     element.proteinTot = recap.protein;
-  //     element.carbsTot = recap.carbs;
-  //     element.fatsTot = recap.fats;
-  //     element.daysCompleted = recap.daysCompleted;
-  //   });
-  // }
-
-
-  function getInfoFromMatchedDates(matchingDates:userCaloriesExtended[]){
+  function getInfoFromMatchedDates(matchingDates:dailyCaloriesExtended[]){
     let calories = 0;
     let protein = 0;
     let carbs = 0;
@@ -219,24 +189,43 @@
     }
 
 
-  weeklyRecapFunctionCaller();
+  recap_functionCaller();
 
-  function weeklyRecapFunctionCaller() {
+  function recap_functionCaller() {
+    convertToJsDates(caloriesTable);
 
     let mondayArray = getMondayCalorieDays();
-    let mondayWeeks = generateWeeksFromMondays(mondayArray);
+    recap_calculateMondays(mondayArray);
 
-    mondayWeeks.forEach((week) => {
-      let matchingDates = getMatchingUserDates(week)
-
-      let info = getInfoFromMatchedDates(matchingDates);
-      caloriesTable.calorieTot = info.calorieTot;
-
-    });
-    //let matchingDates = getMatchingUserDates(mondayWeeks);
-    //getInfoFromMatchedDates(matchingDates)
-    //finalizeRecap(mondayArray)
   }
+
+  function convertToJsDates(cTable) {
+    cTable.forEach(element => {
+      element.created_at = new Date(element.created_at);
+    });
+  }
+  
+  function recap_calculateMondays(mondayArray) {
+    mondayArray.forEach(element => {
+      recap_checkNextDay(element);
+    });
+  }
+
+  function recap_checkNextDay(monday) {
+    const weekLength = 7;
+    let day = monday.created_at;
+    
+    //goto next day
+    for (let index = 0; index < weekLength; index++) {
+      day += 1;
+      console.log(caloriesTable[1].created_at)
+      console.log('DAY: ', day);
+      if (caloriesTable.includes(day)) console.log('YES INCLUDES');
+    }
+  }
+
+
+
 
   function getMondayCalorieDays () {
     //Get every object that is a monday
@@ -247,43 +236,6 @@
       return [];
     }
     return mondayArray;
-  }
-
-  function generateWeeksFromMondays(mondayArray:userCaloriesExtended[]){
-    let weekArray:String[][] = []
-    mondayArray.forEach((element) => {
-      let week = createWeek(element.created_at);
-      weekArray.push(week);
-    });
-    return weekArray;
-  }
-
-  function createWeek(mondayDate:String){
-    //Put this weeks dates in an array
-    const week: Date[] = [];
-    let weekFormatted:String[] = [];
-    const weekLength = 7;
-    let today = new Date(mondayDate);
-    let weekDayIterator = 0; //Monday when this is 0
-    
-    for (let i = 0; i < weekLength; i++) {
-      let iteratedDate = today.setDate(today.getDate() +weekDayIterator);
-      week.push(new Date(iteratedDate));
-      if (weekDayIterator === 0) weekDayIterator += 1;
-    }
-    if (week.length !== 7) new Error('Week length is not 7');
-    week.forEach(date => weekFormatted.push(formatDate(date)));
-    return weekFormatted;
-  }
-
-  function getMatchingUserDates(mondayWeeks:String[]) {
-    let matchingDates: userCaloriesExtended[] = [];
-    matchingDates = caloriesTable.filter(item => mondayWeeks.includes(item.created_at)); //Coercion
-    //!array.length returns true if array is empty, false else
-    if (!matchingDates.length){
-      return [];
-    }
-    return matchingDates;
   }
 
 
@@ -319,6 +271,7 @@
     });
     return {calories, protein, carbs, fats, daysCompleted};
   }
+
 
   //Navigate calendar
   function navigateMonths(step:number) {
@@ -432,7 +385,7 @@
     </span>
     
     {#if isMonday(day.date)}   
-      {#if day.calorieTot && day.type}
+      {#if day.type}
         <span class='test'>
           <span class='bodyweight'>{day.type}</span>
           <span class='bodyweight'>{day.calorieTot} / {day.calorieGoal} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>

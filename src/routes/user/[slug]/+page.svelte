@@ -24,6 +24,7 @@
 	<div class="calendar">
 			<!-- <Calendar {daysTable} {bwTable} {caloriesTable} {dietPlanTable} {uid}/> -->
 	</div>
+
 </div>
 
 
