@@ -4,8 +4,6 @@
   import { toast } from '@zerodevx/svelte-toast'
   import Modal from '../components/Modal.svelte';
   import type { Database, Tables } from '$lib/db/database.types';
-  import { WebSocketAlias } from 'vite';
-
 
   export let daysTable: Tables<'days'>[] | undefined;
   export let bwTable: Tables<'bodyweight'>[] | undefined;
@@ -192,12 +190,18 @@
   recap_functionCaller();
 
   function recap_functionCaller() {
+    let weekList = [];
     convertToJsDates(caloriesTable);
-    console.log("🚀 ~ recap_functionCaller ~ caloriesTable:", caloriesTable)
 
     let mondayArray = getMondayCalorieDays();
-    recap_calculateMondays(mondayArray);
+    createWeeks(mondayArray);
+    //recap_calculateMondays(mondayArray);
+  }
 
+  function createWeeks(mondayArray) {
+    mondayArray.forEach(mon => {
+      
+    });
   }
     
 
@@ -234,7 +238,7 @@
     let mondayArray = caloriesTable?.filter(date => isMonday(date.created_at));
     //!array.length returns true if array is empty, false else
     if (!mondayArray.length) {
-      console.log('function getMondayCalorieDays, parameter array is empty!', arr);
+      console.log('function getMondayCalorieDays, parameter array is empty!', mondayArray);
       return [];
     }
     return mondayArray;
