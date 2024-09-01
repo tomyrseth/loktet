@@ -4,6 +4,7 @@
   import { toast } from '@zerodevx/svelte-toast'
   import Modal from '../components/Modal.svelte';
   import type { Database, Tables } from '$lib/db/database.types';
+  import { WebSocketAlias } from 'vite';
 
 
   export let daysTable: Tables<'days'>[] | undefined;
@@ -90,7 +91,6 @@
     
     //Diet plan is only needed on Monday objects, because monday is weekly recap
     if (dietPlanTable && isMonday(date)) determineCurrentDietPlan(dietPlanTable, date);
-
     if (dailyCalories) defineCalories(dailyCalories);
     if (dailyDays) determineUsername(dailyDays);
     if (dailyBw) bw = dailyBw.bodyweight;
@@ -193,11 +193,13 @@
 
   function recap_functionCaller() {
     convertToJsDates(caloriesTable);
+    console.log("🚀 ~ recap_functionCaller ~ caloriesTable:", caloriesTable)
 
     let mondayArray = getMondayCalorieDays();
     recap_calculateMondays(mondayArray);
 
   }
+    
 
   function convertToJsDates(cTable) {
     cTable.forEach(element => {
@@ -206,21 +208,21 @@
   }
   
   function recap_calculateMondays(mondayArray) {
-    mondayArray.forEach(element => {
-      recap_checkNextDay(element);
+    mondayArray.forEach(monday => {
+      recap_checkNextDay(monday);
     });
   }
 
   function recap_checkNextDay(monday) {
     const weekLength = 7;
-    let day = monday.created_at;
+    let day = new Date(monday.created_at);
     
+    // console.log(caloriesTable[1].created_at)
+    //console.log('DAY: ', day);
     //goto next day
     for (let index = 0; index < weekLength; index++) {
-      day += 1;
-      console.log(caloriesTable[1].created_at)
-      console.log('DAY: ', day);
       if (caloriesTable.includes(day)) console.log('YES INCLUDES');
+      day.setDate(day.getDate() + 1);
     }
   }
 
