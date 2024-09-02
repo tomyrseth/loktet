@@ -57,7 +57,7 @@
 
   
   $: adjustedFirstDayOfMonth = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
-  $: monthName = calendarDate.toLocaleString('se', { month: 'long' });
+  $: monthName = calendarDate.toLocaleString('en', { month: 'long' });
   $: monthnameCapitalized = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   $: emptyStartDays = Array.from({ length: adjustedFirstDayOfMonth });
 
@@ -190,48 +190,19 @@
   recap_functionCaller();
 
   function recap_functionCaller() {
-    let weekList = [];
     convertToJsDates(caloriesTable);
 
     let mondayArray = getMondayCalorieDays();
-    createWeeks(mondayArray);
-    //recap_calculateMondays(mondayArray);
+    let weeks = createWeeks(mondayArray);
+    calculateWeeklyMacros(weeks);
+    console.log(weeks);
   }
-
-  function createWeeks(mondayArray) {
-    mondayArray.forEach(mon => {
-      
-    });
-  }
-    
-
+  
   function convertToJsDates(cTable) {
     cTable.forEach(element => {
       element.created_at = new Date(element.created_at);
     });
   }
-  
-  function recap_calculateMondays(mondayArray) {
-    mondayArray.forEach(monday => {
-      recap_checkNextDay(monday);
-    });
-  }
-
-  function recap_checkNextDay(monday) {
-    const weekLength = 7;
-    let day = new Date(monday.created_at);
-    
-    // console.log(caloriesTable[1].created_at)
-    //console.log('DAY: ', day);
-    //goto next day
-    for (let index = 0; index < weekLength; index++) {
-      if (caloriesTable.includes(day)) console.log('YES INCLUDES');
-      day.setDate(day.getDate() + 1);
-    }
-  }
-
-
-
 
   function getMondayCalorieDays () {
     //Get every object that is a monday
@@ -243,6 +214,40 @@
     }
     return mondayArray;
   }
+
+  function createWeeks(mondayArray) {
+    let weeks = [];
+    let days = [];
+    mondayArray.forEach(mon => {
+      let day = mon.created_at;
+      for (let i = 0; i < 7; i++) {
+        let day2 = structuredClone(day);
+        days.push(day2);
+        day.setDate(day.getDate()+1);
+      }
+      weeks.push(days);
+      days = [];
+    });
+    return weeks;
+  }
+    
+  function calculateWeeklyMacros(weeks){
+    
+    weeks.forEach(week => {
+      let daysTracked = 0;
+      week.forEach(day => {
+        const i = caloriesTable.findIndex(e => e.created_at === day);
+        if (i > -1) {
+          console.log('great success');
+        }
+        console.log('no')
+      });
+    });
+  }
+
+
+
+
 
 
   function weeklyRecap(mondayDate:String) {
