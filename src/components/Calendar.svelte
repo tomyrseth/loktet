@@ -32,7 +32,7 @@
   let firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
   $: adjustedFirstDayOfMonth = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
 
-  $: monthName = currentDate.toLocaleString('se', { month: 'long' });
+  $: monthName = currentDate.toLocaleString('en', { month: 'long' });
   $: monthnameCapitalized = monthName.charAt(0).toUpperCase() + monthName.slice(1);
   $: emptyStartDays = Array.from({ length: adjustedFirstDayOfMonth });
     
