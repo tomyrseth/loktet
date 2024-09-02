@@ -195,7 +195,6 @@
     let mondayArray = getMondayCalorieDays();
     let weeks = createWeeks(mondayArray);
     calculateWeeklyMacros(weeks);
-    console.log(weeks);
   }
   
   function convertToJsDates(cTable) {
@@ -219,7 +218,7 @@
     let weeks = [];
     let days = [];
     mondayArray.forEach(mon => {
-      let day = mon.created_at;
+      let day = structuredClone(mon.created_at);
       for (let i = 0; i < 7; i++) {
         let day2 = structuredClone(day);
         days.push(day2);
@@ -236,6 +235,7 @@
     weeks.forEach(week => {
       let daysTracked = 0;
       week.forEach(day => {
+        //console.log(day == caloriesTable[8].created_at);
         const i = caloriesTable.findIndex(e => e.created_at === day);
         if (i > -1) {
           console.log('great success');
