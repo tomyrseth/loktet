@@ -31,6 +31,7 @@
 		"@fontsource/fira-mono": "^5.0.12",
 		"@fontsource/roboto": "^5.0.12",
 		"@supabase/auth-helpers-sveltekit": "^0.12.0",
-		"@supabase/supabase-js": "^2.39.7"
+		"@supabase/supabase-js": "^2.39.7",
+		"dayjs": "^1.11.13"
 	}
 }

@@ -4,6 +4,7 @@
   import { toast } from '@zerodevx/svelte-toast'
   import Modal from '../components/Modal.svelte';
   import type { Database, Tables } from '$lib/db/database.types';
+  import dayjs from 'dayjs';
 
   export let daysTable: Tables<'days'>[] | undefined;
   export let bwTable: Tables<'bodyweight'>[] | undefined;
@@ -190,16 +191,17 @@
   recap_functionCaller();
 
   function recap_functionCaller() {
-    convertToJsDates(caloriesTable);
+    //convertDates(caloriesTable);
 
     let mondayArray = getMondayCalorieDays();
     let weeks = createWeeks(mondayArray);
-    calculateWeeklyMacros(weeks);
+    console.log(weeks);
+    //calculateWeeklyMacros(weeks);
   }
   
-  function convertToJsDates(cTable) {
+  function convertDates(cTable) {
     cTable.forEach(element => {
-      element.created_at = new Date(element.created_at);
+      element.created_at = dayjs(element.created_at);
     });
   }
 
@@ -218,11 +220,10 @@
     let weeks = [];
     let days = [];
     mondayArray.forEach(mon => {
-      let day = structuredClone(mon.created_at);
+      let day = dayjs(mon.created_at);
       for (let i = 0; i < 7; i++) {
-        let day2 = structuredClone(day);
-        days.push(day2);
-        day.setDate(day.getDate()+1);
+        days.push(day);
+        dayjs(day).add(1, "day");
       }
       weeks.push(days);
       days = [];
