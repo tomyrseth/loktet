@@ -25,7 +25,7 @@
     proteinTot: number,
     carbsTot: number,
     fatsTot: number,
-    daysCompleted: number,
+    daysTracked: number,
   }
 
   let dialog; // ANY type, TODO make a type for this
@@ -38,7 +38,7 @@
   let fats: number|null = 0
   let bw: number|null = 0
   let calorieGoal: number|null = 0
-  let calorieTot = 0, proteinTot = 0, carbsTot = 0, fatsTot = 0, daysCompleted = 0;
+  let calorieTot = 0, proteinTot = 0, carbsTot = 0, fatsTot = 0, daysTracked = 0;
 
   let dailyDays: Tables<'days'> | undefined;
   let dailyCalories: dailyCaloriesExtended | undefined;
@@ -81,7 +81,7 @@
     carbsTot = 0, 
     fatsTot = 0
     calorieGoal = 0;
-    daysCompleted = 0;
+    daysTracked = 0;
     bw = 0;
 
     let date = formatDate(new Date(calendarYear, calendarMonth, i+1));
@@ -112,7 +112,7 @@
       proteinTot,
       carbsTot,
       fatsTot,
-      daysCompleted, //How many days in a week are completed, completed is defined as tracking calories for a day.
+      daysTracked, //How many days in a week are completed, completed is defined as tracking calories for a day.
     }
   });
   
@@ -146,7 +146,7 @@
     proteinTot = dailyCalories.proteinTot;
     carbsTot = dailyCalories.carbsTot;
     fatsTot = dailyCalories.fatsTot;
-    daysCompleted = dailyCalories.daysCompleted;
+    daysTracked = dailyCalories.daysTracked;
   }
 
 
@@ -169,25 +169,6 @@
   }
 
 
-  function getInfoFromMatchedDates(matchingDates:dailyCaloriesExtended[]){
-    let calories = 0;
-    let protein = 0;
-    let carbs = 0;
-    let fats = 0;
-    let daysCompleted = 0;
-
-    daysCompleted = matchingDates.length;
-    //extract calories, protein, carbs, fats from them
-    matchingDates.forEach(object => {
-      calories += object.calories;
-      protein += object.protein;
-      carbs += object.carbs;
-      fats += object.fats;
-    });
-      return {calories, protein, carbs, fats, daysCompleted};
-    }
-
-
   recap_functionCaller();
 
   function recap_functionCaller() {
@@ -195,8 +176,7 @@
 
     let mondayArray = getMondayCalorieDays();
     let weeks = createWeeks(mondayArray);
-    console.log(weeks);
-    //calculateWeeklyMacros(weeks);
+    calculateWeeklyMacros(weeks);
   }
   
   function convertDates(cTable) {
@@ -219,11 +199,12 @@
   function createWeeks(mondayArray) {
     let weeks = [];
     let days = [];
+    let dayIter;
     mondayArray.forEach(mon => {
-      let day = dayjs(mon.created_at);
+      dayIter = dayjs(mon.created_at); //Skip after converting caloriestable to dayjs
       for (let i = 0; i < 7; i++) {
-        days.push(day);
-        dayjs(day).add(1, "day");
+        days.push(dayIter);
+        dayIter = dayjs(dayIter).add(1, "day");
       }
       weeks.push(days);
       days = [];
@@ -234,54 +215,38 @@
   function calculateWeeklyMacros(weeks){
     
     weeks.forEach(week => {
+
+      let calorieSum = 0;
+      let proteinSum = 0;
+      let carbSum = 0;
+      let fatSum = 0;
       let daysTracked = 0;
+      let mondayIndex = null;
+
       week.forEach(day => {
-        //console.log(day == caloriesTable[8].created_at);
-        const i = caloriesTable.findIndex(e => e.created_at === day);
-        if (i > -1) {
-          console.log('great success');
+        
+        //check if date matches days inside week array, then get the index of the matched object.
+        const index = caloriesTable.findIndex(e => dayjs(day).isSame(dayjs(e.created_at)) );
+        if (index > -1) {
+          daysTracked += 1;
+          calorieSum += caloriesTable[index].calories;
+          proteinSum += caloriesTable[index].protein;
+          carbSum += caloriesTable[index].carbs;
+          fatSum += caloriesTable[index].fats;
+
+          if (isMonday(caloriesTable[index].created_at)) mondayIndex = index;
         }
-        console.log('no')
+
       });
+      
+      //add to cal table
+      caloriesTable[mondayIndex].calorieTot = calorieSum;
+      caloriesTable[mondayIndex].proteinTot = proteinSum;
+      caloriesTable[mondayIndex].carbsTot = carbSum;
+      caloriesTable[mondayIndex].fatsTot = fatSum;
+      caloriesTable[mondayIndex].daysTracked = daysTracked;
+
     });
-  }
-
-
-
-
-
-
-  function weeklyRecap(mondayDate:String) {
- 
-    const weekFormatted: Date[] = [];
-    let calories = 0;
-    let protein = 0;
-    let carbs = 0;
-    let fats = 0;
-    let daysCompleted = 0;
-
-
-    let week = createWeek(mondayDate);
-
-    //filter all 7 days into correct format
-    week.forEach(element => {
-      weekFormatted.push(formatDate(element));
-    });
-
-    //get all the dates from caloriesTable(supabase) that match the 7 days
-    const matchingDates = caloriesTable.filter(item => weekFormatted.includes(item.created_at)); //Coercion
-
-    //define daysCompleted for calculations
-    daysCompleted = matchingDates.length;
-    
-    //extract calories, protein, carbs, fats from them
-    matchingDates.forEach(element => {
-      calories += element.calories;
-      protein += element.protein;
-      carbs += element.carbs;
-      fats += element.fats;
-    });
-    return {calories, protein, carbs, fats, daysCompleted};
   }
 
 
@@ -317,9 +282,8 @@
     }
   }
 
-  function isMonday(date) {
-    let temp = new Date(date);    
-    return temp.getDay() === 1;
+  function isMonday(date) {  
+    return dayjs(date).day() === 1;
   }
 
   //BACKEND
@@ -347,7 +311,7 @@
   }
   
   onMount(async () => {
-    //console.log('daysTable: ', daysArray);
+    //console.log('daysArr: ', daysArray);
 	});
   
 </script>
@@ -401,15 +365,15 @@
         <span class='test'>
           <span class='bodyweight'>{day.type}</span>
           <span class='bodyweight'>{day.calorieTot} / {day.calorieGoal} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='bodyweight'> {Math.trunc(day.calorieTot/day.daysCompleted)} / {Math.trunc(day.calorieGoal/day.daysCompleted)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-          <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
-          <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='bodyweight'> {Math.trunc(day.calorieTot/day.daysTracked)} / {Math.trunc(day.calorieGoal/day.daysTracked)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/day.daysTracked)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/day.daysTracked)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
+          <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/day.daysTracked)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
         </span>
 
-        {#if day.daysCompleted != 7 && day.calorieTot}
+        {#if day.daysTracked != 7 && day.calorieTot}
           <span class='test2'>
-            <span class='bodyweight'> {(day.calorieGoal-day.calorieTot)/(7-day.daysCompleted)} per day to reach calorie goal</span>
+            <span class='bodyweight'> { Math.trunc((day.calorieGoal-day.calorieTot)/(7-day.daysTracked)) } per day to reach calorie goal</span>
           </span>
         {/if}
           
