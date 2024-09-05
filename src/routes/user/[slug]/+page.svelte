@@ -8,9 +8,10 @@
 	
 	const uid = 1; //Tom
 
-	$userData = data;
+	//$userData = data;
 
-	console.log($userData);
+	//console.log($userData);
+	console.log(data);
 
 </script>
 
