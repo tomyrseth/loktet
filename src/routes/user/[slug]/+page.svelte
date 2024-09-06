@@ -3,15 +3,18 @@
   import { type Database } from "$lib/db/database.types";
   import type { PageData } from "../../$types";
 	import { userData } from "../../../stores";
+  import dayjs from "dayjs";
 
 	export let data;
+
+	const daysTable = data.userResponse?.data[0].days;
+	const bwTable = data.userResponse?.data[0].bodyweight;
+	const caloriesTable = data.userResponse?.data[0].calories;
+	const dietPlanTable = data.userResponse?.data[0].diet_plan;
 	
-	const uid = 1; //Tom
+	const uid = data.uid; //Tom
 
-	//$userData = data;
-
-	//console.log($userData);
-	console.log(data);
+	console.log(uid);
 
 </script>
 
@@ -23,7 +26,7 @@
 <div class="mainContainer">
 	
 	<div class="calendar">
-			<!-- <Calendar {daysTable} {bwTable} {caloriesTable} {dietPlanTable} {uid}/> -->
+			<Calendar {daysTable} {bwTable} {caloriesTable} {dietPlanTable} {uid}/>
 	</div>
 
 </div>

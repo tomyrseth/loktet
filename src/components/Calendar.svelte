@@ -197,17 +197,22 @@
   }
 
   function createWeeks(mondayArray) {
+
     let weeks = [];
     let days = [];
     let dayIter;
+
     mondayArray.forEach(mon => {
       dayIter = dayjs(mon.created_at); //Skip after converting caloriestable to dayjs
+
       for (let i = 0; i < 7; i++) {
         days.push(dayIter);
         dayIter = dayjs(dayIter).add(1, "day");
       }
+
       weeks.push(days);
       days = [];
+      
     });
     return weeks;
   }
