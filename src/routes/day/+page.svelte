@@ -195,7 +195,7 @@
 
           {#if newExercise}
             <label for="newEx">New exercise name:</label>
-            <input type="text" name='newEx'>
+            <input type="text" name='newEx' required>
           {/if}
 
           <label for='weight'>Weight: </label>
@@ -205,13 +205,13 @@
           {/if}
 
           <label for='sets'>Sets: </label>
-          <input type='number' name='sets'>
+          <input type='number' name='sets' required>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
 
           <label for='reps'>Reps: </label>
-          <input type='number' name='reps'>
+          <input type='number' name='reps' required>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
@@ -244,7 +244,7 @@
       }}>
         <h1>Bodyweight log</h1>
         <label for="">Bodyweight: </label>
-        <input type='number' step='0.1' name='bw'>
+        <input type='number' step='0.1' name='bw' required>
         <input type='hidden' name='today' value={today} />
         <button type='submit'>Submit</button>
       </form>
