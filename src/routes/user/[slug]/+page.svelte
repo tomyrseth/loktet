@@ -12,7 +12,7 @@
 	const caloriesTable = data.userResponse?.data[0].calories;
 	const dietPlanTable = data.userResponse?.data[0].diet_plan;
 	
-	const uid = data.uid; //Tom
+	const uid = data.uid;
 
 	console.log(uid);
 
