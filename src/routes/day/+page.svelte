@@ -28,12 +28,12 @@
 
   let liftsData = data.data;
   let exerciseData = data.exerciseRes?.data;
+  console.log(exerciseData);
   let daysData = data.daysRes?.data;
   let bwData = data.bwRes?.data;
   let caloriesData = data.caloriesRes?.data;
 
   let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
-  $: console.log(liftShow);
   let exerciseSelect :string;
   let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
   let user_name = '';
