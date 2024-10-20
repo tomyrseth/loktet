@@ -5,6 +5,9 @@
   import Modal from '../components/Modal.svelte';
   import type { Database, Tables } from '$lib/db/database.types';
   import dayjs from 'dayjs';
+  import { showCalendar } from '$lib/stores'
+	import { showDay } from '$lib/stores'
+  import { day_id } from '$lib/stores';
 
   export let daysTable: Tables<'days'>[] | undefined;
   export let bwTable: Tables<'bodyweight'>[] | undefined;
@@ -279,7 +282,10 @@
 
   function openDayPage(dayId:number, uid:number, hasTraining:boolean, day){
     if (hasTraining) {
-      goto(`/day/?dayId=${dayId}&uid=${uid}`);
+      //goto(`/day/?dayId=${dayId}&uid=${uid}`);
+      $day_id = dayId;
+      $showCalendar = !$showCalendar;
+      $showDay = !$showDay;
 	  }
     else if (!hasTraining) {
       dialog.showModal()

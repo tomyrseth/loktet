@@ -1,5 +1,7 @@
 <script lang='ts'>
-  import Modal from '../../components/Modal.svelte';
+  import Modal from '../components/Modal.svelte'
+  import { day_id } from '$lib/stores';
+  import type { Database, Tables } from '$lib/db/database.types';
   import { toast } from '@zerodevx/svelte-toast'
   import type { PageData } from '../$types';
   import type { ActionData } from './$types';
@@ -15,32 +17,27 @@
     weight: number;
   }
 
-  export let data: PageData;
-  export let form: ActionData;
+  //export let data: PageData;
+  //export let form: ActionData;
+  export let daysTable: Tables<'days'>[] | undefined;
+  export let uid;
 
   let dialog;
 
-  const url = $page.url;
-  const user_id = url.searchParams.get('user_id');
-  const day_id = url.searchParams.get('day_id');
 
-  let liftsData = data.data;
-  let exerciseData = data.exerciseResponse?.data;
-  let daysData = data.daysResponse?.data;
-  let bwData = data.bwResponse?.data;
-  let caloriesData = data.caloriesResponse?.data;
+
+  //const url = $page.url;
+  //const user_id = url.searchParams.get('user_id');
+  //const day_id = url.searchParams.get('day_id');
+
 
   let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
-  $: console.log(liftShow);
+  //$: console.log(liftShow);
   let exerciseSelect :string;
   let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
   let user_name = '';
   let exercise_id_list = [], arr = [];
   let newExercise = false;
-
-  let currentDay = daysData.find(o => o.id.toString() === day_id);
-
-  let today = currentDay.created_at;
 
   let exercise_id: number
 
@@ -49,6 +46,7 @@
     exercise_id = ex_obj.id;
   }
 
+  /*
   liftsData.forEach(element =>{
     arr.push(element.exercise_id);
     exercise_id_list = [...new Set(arr)];
@@ -80,12 +78,15 @@
           default:
             console.log(`Sorry, we are out of ${user_id}.`);
   }
+  */
 
 </script>
 
 <div class='main'>
-  <h1>{user_name}'s workout, {currentDay.created_at}.</h1>
+  <h1>{user_name}'s workout.</h1>
   <div class="above">
+
+    <p>dayid: {$day_id} uid: {uid}</p>
 
     <div class="above-left">
       <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = true,  bwShow = false, caloriesShow = false, editShow = false)}>Add Lift</button>
@@ -94,28 +95,7 @@
     </div>
 
     <div class="above-right">
-      {#each bwData as bw}
-        <!-- 
-          VERY SCUFFED USING ONLY == NOT ===
-        -->
-        {#if bw.created_at === today && bw.uid == user_id}
-          <p>{user_name}'s weight today is <span style='color: rgb(255, 89, 33)'>{bw.bodyweight}</span> kg</p>
-        {/if}
-      {/each}
-
-      {#each caloriesData as cal}
-      <!-- 
-        VERY SCUFFED USING ONLY == NOT ===
-      -->
-      {#if cal.created_at === today && cal.uid == user_id}
-        <p>{user_name}'s calories today is <span style='color: rgb(255, 89, 33)'>{cal.calories}</span> kcal, {cal.protein}g protein, {cal.carbs}g carbs and {cal.fats}g fats</p>
-      {/if}
-    {/each}
     </div>
-
-
-
-
   </div>
 
 
