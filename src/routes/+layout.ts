@@ -1,7 +1,10 @@
 import { supabase } from "$lib/supabaseClient";
 
 export async function load({ fetch, params }) {
-  const exerciseRes = await supabase.from('exercises').select()
+  const exerciseRes = await supabase
+  .from('exercises')
+  .select('*')
+  .order('name', {ascending: true})
 
   const exercisesErr = exerciseRes.error;
 
