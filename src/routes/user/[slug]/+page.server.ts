@@ -1,6 +1,6 @@
 import { supabase } from "$lib/db/index";
 
-export async function load({ params }) {
+export async function load({ params, depends }) {
 
   let uid = null;
 

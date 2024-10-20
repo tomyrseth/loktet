@@ -1,6 +1,6 @@
 <script lang='ts'>
 	export let data;
-	console.log(data);
+	//console.log(data);
 </script>
 
 <svelte:head>

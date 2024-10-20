@@ -16,19 +16,11 @@
     sets: number;
     weight: number;
   }
-
-  //export let data: PageData;
-  //export let form: ActionData;
   export let daysTable: Tables<'days'>[] | undefined;
   export let uid;
 
   let dialog;
 
-
-
-  //const url = $page.url;
-  //const user_id = url.searchParams.get('user_id');
-  //const day_id = url.searchParams.get('day_id');
 
 
   let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
@@ -46,39 +38,6 @@
     exercise_id = ex_obj.id;
   }
 
-  /*
-  liftsData.forEach(element =>{
-    arr.push(element.exercise_id);
-    exercise_id_list = [...new Set(arr)];
-  });
-
-  //Find exercise name based on id
-  function findExName (id:number){
-    let ex_name = exerciseData.find(o => o.id === id);
-    return ex_name.name;
-  }
-
-  //For edit and delete functions
-  function handleEditClick(lift) {
-    console.log('Lift clicked: ', lift);
-    editShow = true;
-    dialog.showModal()
-  }
-
-  switch (user_id) {
-          case '1':
-            user_name = 'Tom'
-            break;
-          case '2':
-            user_name = 'Saab'
-            break;
-          case '3':
-            user_name = 'Caj'
-            break;
-          default:
-            console.log(`Sorry, we are out of ${user_id}.`);
-  }
-  */
 
 </script>
 

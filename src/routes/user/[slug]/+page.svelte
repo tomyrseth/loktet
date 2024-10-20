@@ -10,17 +10,19 @@
 
 	export let data;
 
-	const daysTable = data.userResponse?.data[0].days;
-	const bwTable = data.userResponse?.data[0].bodyweight;
-	const caloriesTable = data.userResponse?.data[0].calories;
-	const dietPlanTable = data.userResponse?.data[0].diet_plan;
+	$:daysTable = data.userResponse?.data[0].days;
+	$:bwTable = data.userResponse?.data[0].bodyweight;
+	$:caloriesTable = data.userResponse?.data[0].calories;
+	$:dietPlanTable = data.userResponse?.data[0].diet_plan;
 	
-	const uid = data.uid;
+	$:uid = data.uid;
+
+	//$: console.log(uid);
 
 	//console.log(uid);
 
-	$:console.log($showDay);
-	$:console.log($day_id);
+	//$:console.log($showDay);
+	//$:console.log($day_id);
 
 
 	function switchComponent() {
