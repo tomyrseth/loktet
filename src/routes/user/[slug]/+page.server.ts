@@ -24,10 +24,18 @@ export async function load({ params, depends }) {
     .eq('id', uid);
   
   const userError = userResponse.error;
-
   if (userError) return {status: 500,body: {error: `Error: ${userError.message}`}};
+
+  const exerciseResponse = await supabase
+  .from('exercises')
+  .select('*')
+  .order('name', { ascending: true} )
+
+  const exerciseError = exerciseResponse.error;
+  if (exerciseError) return {status: 500,body: {error: `Error: ${exerciseError.message}`}};
+
   
   return {
-    userResponse, uid
+    userResponse, exerciseResponse, uid
   };
 }

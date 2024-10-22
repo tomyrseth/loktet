@@ -10,10 +10,13 @@
 
 	export let data;
 
+	
 	$:daysTable = data.userResponse?.data[0].days;
 	$:bwTable = data.userResponse?.data[0].bodyweight;
 	$:caloriesTable = data.userResponse?.data[0].calories;
 	$:dietPlanTable = data.userResponse?.data[0].diet_plan;
+	
+	$:exerciseTable = data.exerciseResponse?.data;
 	
 	$:uid = data.uid;
 
@@ -48,7 +51,7 @@
 		{/if}
 
 		{#if $showDay}
-			<LiftDay {daysTable} {uid}/>
+			<LiftDay {daysTable} {bwTable} {caloriesTable} {uid} {exerciseTable}/>
 		{/if}
 	</div>
 

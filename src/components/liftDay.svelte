@@ -17,14 +17,21 @@
     weight: number;
   }
   export let daysTable: Tables<'days'>[] | undefined;
+  export let bwTable: Tables<'bodyweight'>[] | undefined;
+  export let caloriesTable: Tables<'calories'>[] | undefined;
+  export let exerciseTable: Tables<'exercises'>[] | undefined;
   export let uid;
+
+  export let form: ActionData;
 
   let dialog;
 
+  let currentDay = daysTable.find(o => o.id === $day_id);
+
+  let today = currentDay.created_at;
 
 
   let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
-  //$: console.log(liftShow);
   let exerciseSelect :string;
   let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
   let user_name = '';
@@ -34,9 +41,14 @@
   let exercise_id: number
 
   $: if (exerciseSelect){
-    let ex_obj = exerciseData.find(o => o.name === exerciseSelect);
+    let ex_obj = exerciseTable.find(o => o.name === exerciseSelect);
     exercise_id = ex_obj.id;
   }
+
+  .forEach(element =>{
+    arr.push(element.exercise_id);
+    exercise_id_list = [...new Set(arr)];
+  });
 
 
 </script>
@@ -117,11 +129,11 @@
           <h1>Lift log</h1>
           <label for='exercise'>Exercise: </label>
           <select bind:value={exerciseSelect} name='exercise'>
-            {#each exerciseData as exercise}
+            {#each exerciseTable as exercise}
               <option >{exercise.name}</option>
             {/each}
           </select>
-          <option value={exerciseData}></option>
+          <option value={exerciseTable}></option>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
@@ -232,11 +244,11 @@
           <h1>Lift log</h1>
           <label for='exercise'>Exercise: </label>
           <select bind:value={exerciseSelect} name='exercise'>
-            {#each exerciseData as exercise}
+            {#each exerciseTable as exercise}
               <option >{exercise.name}</option>
             {/each}
           </select>
-          <option value={exerciseData}></option>
+          <option value={exerciseTable}></option>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
