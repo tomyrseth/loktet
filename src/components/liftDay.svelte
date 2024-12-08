@@ -45,10 +45,12 @@
     exercise_id = ex_obj.id;
   }
 
-  .forEach(element =>{
+  /*
+  liftsData.forEach(element =>{
     arr.push(element.exercise_id);
     exercise_id_list = [...new Set(arr)];
   });
+  */
 
 
 </script>
