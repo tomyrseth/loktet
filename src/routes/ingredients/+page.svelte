@@ -5,9 +5,10 @@
 
 </script>
 
-Food database
+<h1>Ingredient database</h1>
 <h1 style='color:white'>{data.data[0]}</h1>
 
+<!--
 <table>
   <tr>
   {#each Object.keys(food) as key}
@@ -21,8 +22,13 @@ Food database
     {/each}
   </tr>
 </table> 
+-->
 
 <style>
+  h1 {
+    color: white;
+  }
+
   table {
     color: white;
     background-color: rgba(0, 0, 0, 0.393);

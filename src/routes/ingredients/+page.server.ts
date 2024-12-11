@@ -1,12 +1,12 @@
-import { supabase } from "$lib/supabaseClient";
+import { supabase } from "$lib/db/index";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async () => {
 
   const { data, error } = await supabase
 
-  .from('foods')
+  .from('ingredients')
   .select('*')
   return{
     data: data ?? [],
