@@ -26,15 +26,17 @@
 
   let dialog;
 
-  let currentDay = daysTable.find(o => o.id === $day_id);
+  let currentDay = daysTable?.find(o => o.id === $day_id);
 
-  let today = currentDay.created_at;
+  let today = currentDay?.created_at;
+
+  console.log('T', currentDay);
 
 
   let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
   let exerciseSelect :string;
   let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
-  let user_name = '';
+  let user_name = 'TEST';
   let exercise_id_list = [], arr = [];
   let newExercise = false;
 

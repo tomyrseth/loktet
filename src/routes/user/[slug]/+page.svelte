@@ -7,9 +7,11 @@
 	import { showDay } from '$lib/stores'
 	import { day_id } from '$lib/stores'
   import dayjs from "dayjs";
+  import { get } from "svelte/store";
 
 	export let data;
 
+	console.log('hejoloelu', data.daysResponse.data[0].lifts);
 	
 	$:daysTable = data.userResponse?.data[0].days;
 	$:bwTable = data.userResponse?.data[0].bodyweight;
