@@ -9,6 +9,7 @@
   import dayjs from "dayjs";
   import { get } from "svelte/store";
 
+	//Backend data
 	export let data;
 
 	console.log('All data: ',data); //all data from backend
