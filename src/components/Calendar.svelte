@@ -80,13 +80,11 @@
     }
 
     if (dietPlanArr){
-      console.log("HEREHREHREHR")
       // Sort objects by id in descending order
       dietPlanArr.sort((a, b) => b.id - a.id);
       // Find the first upcoming date
       const result = dietPlanArr.find(item => new Date(item.created_at) < new Date(date));
       // Handle the case where no future date is found
-      console.log("RESULT", result)
       if (result){
         type = result.type;
         amount = result.calorieGoal;
@@ -330,7 +328,7 @@
         <span class='test'>
           <span class='bodyweight'>{day.type}</span>
           <span class='bodyweight'>{day.calorieTot} / {day.amount} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
-          <span class='bodyweight'> {Math.trunc(day.calorieTot/day.daysCompleted)} / {Math.trunc(day.amount/day.daysCompleted)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
+          <span class='bodyweight'> {Math.trunc(day.calorieTot/day.daysCompleted)} / {Math.trunc(day.amount/7)} <abbr style='color: rgb(80, 80, 80)'>kcal</abbr></span>
           <span class='recap-text'>  Protein: {day.proteinTot} / {Math.trunc(day.proteinTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
           <span class='recap-text'> Carbs: {day.carbsTot} / {Math.trunc(day.carbsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
           <span class='recap-text'> Fats: {day.fatsTot} / {Math.trunc(day.fatsTot/day.daysCompleted)}  <abbr style='color: rgb(80, 80, 80)'>g</abbr> </span>
