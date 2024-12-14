@@ -11,7 +11,13 @@
 
 	export let data;
 
-	console.log(data);
+	console.log('All data: ',data); //all data from backend
+
+	let allLifts = data.allLiftsResponse?.data;
+
+	console.log('All days with lifts: ', allLifts); //All lifts for a specific user
+
+	// $ means reactive variable, if data changes in variable it is updates on page instantly
 	
 	$:daysTable = data.userResponse?.data[0].days;
 	$:bwTable = data.userResponse?.data[0].bodyweight;
@@ -35,6 +41,7 @@
 		$showDay = !$showDay;
 	}
 
+	// INSERT JAVASCRIPT for graph below
 
 	
 
@@ -45,6 +52,10 @@
 	<title>Tom</title>
 	<meta name="description" content="About this app" />
 </svelte:head>
+
+<!-- 
+comment out div mainContainer if you want like this (removes calendar)
+-->
 
 <div class="mainContainer">
 
@@ -61,10 +72,15 @@
 	</div>
 </div>
 
+
+<!-- INSERT GRAPH TESTING STUFF BELOW IN DIVS OR WHAtEVER THE FUCK YOU WANT -->
+
 <div>
-	<h2>TeSt</h2>
+	<h2>TeSt graph</h2>
 </div>
 
+
+<!-- CSS BELOW: -->
 <style>
 
 	.mainContainer {
