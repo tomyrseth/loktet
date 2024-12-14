@@ -8,8 +8,8 @@
 <h1>Ingredient database</h1>
 <h1 style='color:white'>{data.data[0]}</h1>
 
-<!--
 <table>
+<!--
   <tr>
   {#each Object.keys(food) as key}
     <th>{key}</th>
