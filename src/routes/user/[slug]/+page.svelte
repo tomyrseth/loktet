@@ -11,7 +11,7 @@
 
 	export let data;
 
-	console.log('hejoloelu', data.daysResponse.data[0].lifts);
+	console.log(data);
 	
 	$:daysTable = data.userResponse?.data[0].days;
 	$:bwTable = data.userResponse?.data[0].bodyweight;
@@ -36,6 +36,9 @@
 	}
 
 
+	
+
+
 </script>
 
 <svelte:head>
@@ -56,10 +59,11 @@
 			<LiftDay {daysTable} {bwTable} {caloriesTable} {uid} {exerciseTable}/>
 		{/if}
 	</div>
-
-
 </div>
 
+<div>
+	<h2>TeSt</h2>
+</div>
 
 <style>
 

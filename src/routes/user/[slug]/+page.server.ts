@@ -30,11 +30,19 @@ export async function load({ params, depends }) {
     .eq('uid', uid)
     .gte('created_at', '2024-12-01');
 
+  const allLiftsResponse = await supabase
+    .from('days')
+    .select('*, lifts(*)')
+    .eq('uid', uid)
+
   const userError = userResponse.error;
   if (userError) return {status: 500,body: {error: `Error userResponse: ${userError.message}`}};
 
   const daysError = daysResponse.error;
   if (daysError) return {status: 500,body: {error: `Error daysResponse: ${daysError.message}`}};
+
+  const allLiftsError = allLiftsResponse.error;
+  if (allLiftsError) return {status: 500,body: {error: `Error allLiftsResponse: ${allLiftsError.message}`}};
 
   const exerciseResponse = await supabase
   .from('exercises')
@@ -46,6 +54,6 @@ export async function load({ params, depends }) {
 
   
   return {
-    userResponse, exerciseResponse, daysResponse, uid
+    userResponse, exerciseResponse, daysResponse, allLiftsResponse, uid
   };
 }
