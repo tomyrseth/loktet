@@ -13,10 +13,6 @@
 
 	console.log('All data: ',data); //all data from backend
 
-	let allLifts = data.allLiftsResponse?.data;
-
-	console.log('All days with lifts: ', allLifts); //All lifts for a specific user
-
 	// $ means reactive variable, if data changes in variable it is updates on page instantly
 	
 	$:daysTable = data.userResponse?.data[0].days;

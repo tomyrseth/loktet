@@ -139,6 +139,7 @@
   }
   
   function defineCalories(dailyCalories:dailyCaloriesExtended) {
+    
     calories = dailyCalories.calories;
     protein = dailyCalories.protein;
     carbs = dailyCalories.carbs;
@@ -146,6 +147,7 @@
 
     // Below variables extend current calorie table from supabase
     calorieTot = dailyCalories.calorieTot;
+    console.log("🚀 ~ defineCalories ~ calorieTot:", calorieTot)
     proteinTot = dailyCalories.proteinTot;
     carbsTot = dailyCalories.carbsTot;
     fatsTot = dailyCalories.fatsTot;
