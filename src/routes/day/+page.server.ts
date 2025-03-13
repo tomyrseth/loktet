@@ -25,6 +25,7 @@ export const actions: Actions = {
     const sets = formData.get('sets');
     const reps = formData.get('reps');
     const notes = formData.get('notes');
+    const rir = formData.get('rir');
     const ex_id = formData.get('ex_id');
     const day_id = formData.get('day_id');
 
@@ -35,7 +36,7 @@ export const actions: Actions = {
     const { data, error } = await supabase
     .from('lifts')
     .insert([
-      { day_id: day_id, exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes }
+      { day_id: day_id, exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes, rir: rir }
     ]);
 
     if (!error) {

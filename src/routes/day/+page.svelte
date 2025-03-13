@@ -6,6 +6,7 @@
   import type { PageData } from '../$types';
   import type { ActionData } from './$types';
   import { enhance } from '$app/forms';
+  import { onMount } from 'svelte';
 
   type lifts = {
     id: number;
@@ -153,6 +154,10 @@
                     <p>Notes: <span style='color: rgb(120, 120, 120)'>{lift.notes}</span></p>
                   {/if}
 
+                  {#if lift.rir !== null}
+                  <p>RIR: <span style='color: rgb(120, 120, 120)'>{lift.rir}</span></p>
+                {/if}
+
                 </div>
               {/if}
             {/each}
@@ -218,6 +223,12 @@
 
           <label for='notes'>Notes: </label>
           <input type="text" name='notes'>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='rir'>RIR: </label>
+          <input type='number' name='rir'>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
