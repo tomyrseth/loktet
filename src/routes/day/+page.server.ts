@@ -25,12 +25,15 @@ export const actions: Actions = {
     const sets = formData.get('sets');
     const reps = formData.get('reps');
     const notes = formData.get('notes');
-    const rir = formData.get('rir');
+    let rir = formData.get('rir');
     const ex_id = formData.get('ex_id');
     const day_id = formData.get('day_id');
 
     if (!weight) {
       weight = 0;
+    }
+    if (!rir) {
+      rir = null;
     }
 
     const { data, error } = await supabase
