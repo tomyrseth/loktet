@@ -223,15 +223,6 @@
             <p>This field is required</p>
           {/if}
 
-          <button type="button" on:click={() => newExercise = !newExercise}>
-            Add new exercise
-          </button>
-
-          {#if newExercise}
-            <label for="newEx">New exercise name:</label>
-            <input type="text" name='newEx'>
-          {/if}
-
           <label for='weight'>Weight: </label>
           <input type='number' step='0.1' name='weight'>
           {#if form?.missing}
@@ -256,6 +247,8 @@
             <p>This field is required</p>
           {/if}
 
+          <button type="submit">+ Add lift</button>
+
           <label for='notes'>Notes: </label>
           <input type="text" name='notes'>
           {#if form?.missing}
@@ -265,7 +258,6 @@
           <input type='hidden' name='ex_id' value={exercise_id} />
           <input type='hidden' name='day_id' value={day_id} />
 
-          <button type="submit">+ Add lift</button>
           <p style="color: lightgrey;">(ESC to close)</p>
         
         </form>
