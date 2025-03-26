@@ -89,11 +89,12 @@ export const actions: Actions = {
   editLift: async ({ request }) => {
     const formData = await request.formData()
     let weight = formData.get('weight');
+    const liftID = formData.get('id');
     const sets = formData.get('sets');
     const reps = formData.get('reps');
     const notes = formData.get('notes');
     const ex_id = formData.get('ex_id');
-    const day_id = formData.get('day_id');
+    console.log('backend', formData);
 
     if (!weight) {
       weight = 0;
@@ -101,17 +102,30 @@ export const actions: Actions = {
 
     const { data, error } = await supabase
     .from('lifts')
-    .insert([
-      { day_id: day_id, exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes }
-    ]);
+    .update({exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes})
+    .eq('id', liftID);
+
+    if (!error) {
+      return { success: true , data: data}
+    }
+    throw new Error(error.message);
+  },
+
+  deleteLift: async ({ request }) => {
+    const formData = await request.formData()
+    const liftID = formData.get('id');
+    console.log('backend', formData);
+
+    const { data, error } = await supabase
+    .from('lifts')
+    .delete()
+    .eq('id', liftID);
 
     if (!error) {
       return { success: true , data: data}
     }
     throw new Error(error.message);
   }
-
-
 
 
 

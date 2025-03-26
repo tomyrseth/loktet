@@ -23,6 +23,8 @@
 
   let dialog;
 
+  let clickedEditLift;
+
   const url = $page.url;
   const user_id = url.searchParams.get('user_id');
   const day_id = url.searchParams.get('day_id');
@@ -65,9 +67,31 @@
 
   //For edit and delete functions
   function handleEditClick(lift) {
-    console.log('Lift clicked: ', lift);
+    clickedEditLift = lift;
     editShow = true;
+    liftShow = false;
+    console.log('Lift clicked: ', lift, editShow);
     dialog.showModal()
+  }
+
+  async function handleDeleteClick(lift) {
+    const formData = new FormData();
+    clickedEditLift = lift;
+    formData.append('id', lift.id);
+    console.log('Lift clicked: ', lift);
+
+    const response = await fetch('?/deleteLift', {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+    console.log(result)
+    console.log(result.success)
+    if (result.type === "success") {
+      console.log('yay')
+      location.reload();
+    }
   }
 
   switch (user_id) {
@@ -136,6 +160,10 @@
                       <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
                       <path d="M13.5 6.5l4 4" />
                     </svg>
+                  </button>
+
+                  <button class="editButton" on:click={() => handleDeleteClick(lift)}>
+                    X
                   </button>
 
                   {#if lift.weight !== 0}
@@ -221,14 +249,14 @@
             <p>This field is required</p>
           {/if}
 
-          <label for='notes'>Notes: </label>
-          <input type="text" name='notes'>
+          <label for='rir'>RIR: </label>
+          <input type='number' name='rir'>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
 
-          <label for='rir'>RIR: </label>
-          <input type='number' name='rir'>
+          <label for='notes'>Notes: </label>
+          <input type="text" name='notes'>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
@@ -303,11 +331,11 @@
             }
           };
         }}>
-          <h1>Lift log</h1>
+          <h1>Lift log (editing)</h1>
           <label for='exercise'>Exercise: </label>
           <select bind:value={exerciseSelect} name='exercise'>
             {#each exerciseData as exercise}
-              <option >{exercise.name}</option>
+              <option>{exercise.name}</option>
             {/each}
           </select>
           <option value={exerciseData}></option>
@@ -315,43 +343,40 @@
             <p>This field is required</p>
           {/if}
 
-          <button type="button" on:click={() => newExercise = !newExercise}>
-            Add new exercise
-          </button>
-
-          {#if newExercise}
-            <label for="newEx">New exercise name:</label>
-            <input type="text" name='newEx'>
-          {/if}
-
           <label for='weight'>Weight: </label>
-          <input type='number' step='0.1' name='weight'>
+          <input type='number' step='0.1' name='weight' value={clickedEditLift.weight}>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
 
           <label for='sets'>Sets: </label>
-          <input type='number' name='sets'>
+          <input type='number' name='sets' value={clickedEditLift.sets}>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
 
           <label for='reps'>Reps: </label>
-          <input type='number' name='reps'>
+          <input type='number' name='reps' value={clickedEditLift.reps}>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='rir'>RIR: </label>
+          <input type='number' name='rir' value={clickedEditLift.rir}>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
 
           <label for='notes'>Notes: </label>
-          <input type="text" name='notes'>
+          <input type="text" name='notes' value={clickedEditLift.notes}>
           {#if form?.missing}
             <p>This field is required</p>
           {/if}
 
           <input type='hidden' name='ex_id' value={exercise_id} />
-          <input type='hidden' name='day_id' value={day_id} />
+          <input type='hidden' name='id' value={clickedEditLift.id} />
 
-          <button type="submit">+ Add lift</button>
+          <button type="submit">Edit lift</button>
           <p style="color: lightgrey;">(ESC to close)</p>
         
         </form>
@@ -447,6 +472,7 @@
   }
 
   .editButton {
+    color: white;
     position: relative;
     top: 1.5em;
     left: 5.5em;
