@@ -24,6 +24,7 @@
   let dialog;
 
   let clickedEditLift;
+  let changeExercise = false;
 
   const url = $page.url;
   const user_id = url.searchParams.get('user_id');
@@ -332,15 +333,24 @@
           };
         }}>
           <h1>Lift log (editing)</h1>
-          <label for='exercise'>Exercise: </label>
-          <select bind:value={exerciseSelect} name='exercise'>
-            {#each exerciseData as exercise}
-              <option>{exercise.name}</option>
-            {/each}
-          </select>
-          <option value={exerciseData}></option>
-          {#if form?.missing}
-            <p>This field is required</p>
+
+          {#if !changeExercise}
+            <button type='button' class="changeExercise" on:click={() => (changeExercise = !changeExercise)}>
+              Change exercise
+            </button>
+          {/if}
+
+          {#if changeExercise}
+            <label for='exercise'>Exercise: </label>
+            <select bind:value={exerciseSelect} name='exercise'>
+              {#each exerciseData as exercise}
+                <option>{exercise.name}</option>
+              {/each}
+            </select>
+            <input type='hidden' name='ex_id' value={exercise_id} />
+            {#if form?.missing}
+              <p>This field is required</p>
+            {/if}
           {/if}
 
           <label for='weight'>Weight: </label>
@@ -373,8 +383,8 @@
             <p>This field is required</p>
           {/if}
 
-          <input type='hidden' name='ex_id' value={exercise_id} />
           <input type='hidden' name='id' value={clickedEditLift.id} />
+          <input type='hidden' name='ex_id' value={clickedEditLift.exercise_id} />
 
           <button type="submit">Edit lift</button>
           <p style="color: lightgrey;">(ESC to close)</p>
@@ -385,6 +395,7 @@
     {/if}
   </Modal>
 </div>
+
 
 <style>
   .outer-movement-container {
