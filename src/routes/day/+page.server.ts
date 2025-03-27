@@ -94,7 +94,7 @@ export const actions: Actions = {
     const reps = formData.get('reps');
     const notes = formData.get('notes');
     const ex_id = formData.get('ex_id');
-    console.log('backend', formData);
+    console.log('backend edit', formData);
 
     if (!weight) {
       weight = 0;
@@ -114,7 +114,7 @@ export const actions: Actions = {
   deleteLift: async ({ request }) => {
     const formData = await request.formData()
     const liftID = formData.get('id');
-    console.log('backend', formData);
+    console.log('backend delete', formData);
 
     const { data, error } = await supabase
     .from('lifts')

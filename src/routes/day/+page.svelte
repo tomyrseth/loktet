@@ -8,6 +8,11 @@
   import { enhance } from '$app/forms';
   import { onMount } from 'svelte';
 
+onMount(() => {
+  sortLiftsData();
+  console.log('liftsData ',liftsData);
+});
+
   type lifts = {
     id: number;
     day_id: number;
@@ -23,8 +28,10 @@
 
   let dialog;
 
+  let liftsSorted = false;
   let clickedEditLift;
   let changeExercise = false;
+  let addLiftOfSameType = false;
 
   const url = $page.url;
   const user_id = url.searchParams.get('user_id');
@@ -32,7 +39,6 @@
 
   let liftsData = data.data;
   let exerciseData = data.exerciseRes?.data;
-  console.log(exerciseData);
   let daysData = data.daysRes?.data;
   let bwData = data.bwRes?.data;
   let caloriesData = data.caloriesRes?.data;
@@ -71,7 +77,8 @@
     clickedEditLift = lift;
     editShow = true;
     liftShow = false;
-    console.log('Lift clicked: ', lift, editShow);
+    console.log('Lift clicked (edit): ', lift);
+    sortLiftsData();
     dialog.showModal()
   }
 
@@ -79,7 +86,7 @@
     const formData = new FormData();
     clickedEditLift = lift;
     formData.append('id', lift.id);
-    console.log('Lift clicked: ', lift);
+    console.log('Lift clicked (delete): ', lift);
 
     const response = await fetch('?/deleteLift', {
       method: 'POST',
@@ -93,6 +100,22 @@
       console.log('yay')
       location.reload();
     }
+  }
+
+  function handleAdditionalSetClick(lift) {
+    clickedEditLift = lift;
+    console.log('Lift clicked (add): ', lift);
+    liftShow = false;
+    bwShow = false;
+    caloriesShow = false;
+    editShow = false;
+    addLiftOfSameType = true;
+    dialog.showModal()
+  }
+
+  function sortLiftsData () {
+    liftsData = liftsData.sort((a, b) => a.id - b.id);
+    liftsSorted = true;
   }
 
   switch (user_id) {
@@ -116,9 +139,9 @@
   <div class="above">
 
     <div class="above-left">
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = true,  bwShow = false, caloriesShow = false, editShow = false)}>Add Lift</button>
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = true,  caloriesShow = false, editShow = false)}>Add BW</button>
-      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = false, caloriesShow = true,  editShow = false)}>Add Calories</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = true,  bwShow = false, caloriesShow = false, editShow = false, addLiftOfSameType = false)}>Add Lift</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = true,  caloriesShow = false, editShow = false, addLiftOfSameType = false)}>Add BW</button>
+      <button class='plusButton' on:click={() => (dialog.showModal(), liftShow = false, bwShow = false, caloriesShow = true,  editShow = false, addLiftOfSameType = false)}>Add Calories</button>
     </div>
 
     <div class="above-right">
@@ -150,46 +173,55 @@
   <div class="outer-movement-container">
     {#each exercise_id_list as ex}
       <div class="inner-movement-container">
+        
         <h2 class='ex-name'>{findExName(ex)}</h2>
+          {#if liftsSorted}
             {#each liftsData as lift}
               {#if lift.exercise_id === ex}
                 <div class='movement'>
 
-                  <button class='editButton' on:click={() => handleEditClick(lift)}>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                      <path d="M13.5 6.5l4 4" />
-                    </svg>
-                  </button>
+                  <div class="numberContainer">
+                    <p>Lift id: {lift.id}</p>
+                    {#if lift.weight !== 0}
+                      <p>Weight: <span style='color: rgb(255, 89, 33)'>{lift.weight}</span></p>
+                    {/if}
+  
+                    <p>Sets: <span style='color: rgb(255, 89, 33)'>{lift.sets}</span></p>
+  
+                    {#if lift.reps === 0}
+                      <p><span style='color: rgb(255, 0, 0)'>Reps: {lift.reps}</span></p>
+                    {:else}
+                      <p>Reps: <span style='color: rgb(255, 89, 33)'>{lift.reps}</span></p>
+                    {/if}
+  
+                    {#if lift.notes !== ''}
+                      <p>Notes: <span style='color: rgb(120, 120, 120)'>{lift.notes}</span></p>
+                    {/if}
+  
+                    {#if lift.rir !== null}
+                      <p>RIR: <span style='color: rgb(120, 120, 120)'>{lift.rir}</span></p>
+                    {/if}
+                  </div>
 
-                  <button class="editButton" on:click={() => handleDeleteClick(lift)}>
-                    X
-                  </button>
-
-                  {#if lift.weight !== 0}
-                    <p>Weight: <span style='color: rgb(255, 89, 33)'>{lift.weight}</span></p>
-                  {/if}
-
-                  <p>Sets: <span style='color: rgb(255, 89, 33)'>{lift.sets}</span></p>
-
-                  {#if lift.reps === 0}
-                    <p><span style='color: rgb(255, 0, 0)'>Reps: {lift.reps}</span></p>
-                  {:else}
-                    <p>Reps: <span style='color: rgb(255, 89, 33)'>{lift.reps}</span></p>
-                  {/if}
-
-                  {#if lift.notes !== ''}
-                    <p>Notes: <span style='color: rgb(120, 120, 120)'>{lift.notes}</span></p>
-                  {/if}
-
-                  {#if lift.rir !== null}
-                  <p>RIR: <span style='color: rgb(120, 120, 120)'>{lift.rir}</span></p>
-                {/if}
+                  <div class="editButtonsContainer">
+                    <button class='editButton addSetButton' on:click={() => handleAdditionalSetClick(lift)}>+</button>
+                    <button class='editButton' on:click={() => handleEditClick(lift)}>
+                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                        <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                        <path d="M13.5 6.5l4 4" />
+                      </svg>
+                    </button>
+  
+                    <button class="editButton" on:click={() => handleDeleteClick(lift)}>
+                      X
+                    </button>
+                  </div>
 
                 </div>
               {/if}
             {/each}
+          {/if}
       </div>
     {/each}
   </div>
@@ -384,14 +416,75 @@
         </form>
       </div>
 
+    {:else if addLiftOfSameType === true}
+      <div class='modal'>
+        <form method='POST' class='form' action='?/lift' use:enhance={() => {
+          return async ({ result }) => {
+            if (result.type === 'success') {
+              console.log('lift update success')
+              location.reload();
+            } else {
+              console.log('lift update failed')
+            }
+          };
+        }}>
+          <h1>Additional set log</h1>
+
+          <label for='weight'>Weight: </label>
+          <input type='number' step='0.1' name='weight' value={clickedEditLift.weight}>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='sets'>Sets: </label>
+          <input type='number' name='sets' value={clickedEditLift.sets}>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='reps'>Reps: </label>
+          <input type='number' name='reps' value={clickedEditLift.reps}>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='rir'>RIR: </label>
+          <input type='number' name='rir' value={clickedEditLift.rir}>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <label for='notes'>Notes: </label>
+          <input type="text" name='notes' value={clickedEditLift.notes}>
+          {#if form?.missing}
+            <p>This field is required</p>
+          {/if}
+
+          <input type='hidden' name='id' value={clickedEditLift.id} />
+          <input type='hidden' name='ex_id' value={clickedEditLift.exercise_id} />
+          <input type='hidden' name='day_id' value={clickedEditLift.day_id} />
+
+          <button type="submit">Add set</button>
+          <p style="color: lightgrey;">(ESC to close)</p>
+        
+        </form>
+      </div>
+    
     {/if}
   </Modal>
 </div>
 
 
 <style>
+  .main {
+    display: flex;
+    flex-direction: column;
+    align-items:center ;
+  }
+
   .outer-movement-container {
     display: flex;
+    width: fit-content;
     flex-direction: column;
     border-radius: 15px;
   }
@@ -399,6 +492,7 @@
   .inner-movement-container {
     background-color: rgba(0, 0, 0, 0.472);
     display: flex;
+    width: auto;
     flex-direction: row;
     border-radius: 15px;
     border-bottom: solid rgb(255, 89, 33) 2px;
@@ -410,17 +504,24 @@
 
   .movement {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    min-width: 130px;
     flex-wrap: wrap;
     text-wrap: wrap;
     margin: 0em 0em 0em 0em;
-    padding: 0em 4em 1em 1em;
+    padding: 1em 1em 1em 1em;
     border-radius: 12px;
     border-right: dashed rgba(255, 255, 255, 0.574) 2px;
   }
 
+  .numberContainer, .editButtonsContainer {
+    display: flex;
+    flex-direction: column;
+  }
+
   .ex-name {
     font-weight: bold;
+    display: flex;
     color: rgb(255, 89, 33);
     width: 150px;
     padding: 5px 0px 0px 5px;
@@ -476,9 +577,8 @@
 
   .editButton {
     color: white;
-    position: relative;
-    top: 1.5em;
-    left: 5.5em;
+    margin-left: 10px;
+    margin-bottom: 4px;
     width: 2em;
     height: 2em;
     background-color: transparent;
