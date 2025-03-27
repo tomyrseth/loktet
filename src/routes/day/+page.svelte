@@ -9,7 +9,6 @@
   import { onMount } from 'svelte';
 
 onMount(() => {
-  sortLiftsData();
   console.log('liftsData ',liftsData);
 });
 
@@ -27,8 +26,6 @@ onMount(() => {
   export let form: ActionData;
 
   let dialog;
-
-  let liftsSorted = false;
   let clickedEditLift;
   let changeExercise = false;
   let addLiftOfSameType = false;
@@ -78,7 +75,6 @@ onMount(() => {
     editShow = true;
     liftShow = false;
     console.log('Lift clicked (edit): ', lift);
-    sortLiftsData();
     dialog.showModal()
   }
 
@@ -111,11 +107,6 @@ onMount(() => {
     editShow = false;
     addLiftOfSameType = true;
     dialog.showModal()
-  }
-
-  function sortLiftsData () {
-    liftsData = liftsData.sort((a, b) => a.id - b.id);
-    liftsSorted = true;
   }
 
   switch (user_id) {
@@ -175,53 +166,51 @@ onMount(() => {
       <div class="inner-movement-container">
         
         <h2 class='ex-name'>{findExName(ex)}</h2>
-          {#if liftsSorted}
-            {#each liftsData as lift}
-              {#if lift.exercise_id === ex}
-                <div class='movement'>
+          {#each liftsData as lift}
+            {#if lift.exercise_id === ex}
+              <div class='movement'>
 
-                  <div class="numberContainer">
-                    <p>Lift id: {lift.id}</p>
-                    {#if lift.weight !== 0}
-                      <p>Weight: <span style='color: rgb(255, 89, 33)'>{lift.weight}</span></p>
-                    {/if}
-  
-                    <p>Sets: <span style='color: rgb(255, 89, 33)'>{lift.sets}</span></p>
-  
-                    {#if lift.reps === 0}
-                      <p><span style='color: rgb(255, 0, 0)'>Reps: {lift.reps}</span></p>
-                    {:else}
-                      <p>Reps: <span style='color: rgb(255, 89, 33)'>{lift.reps}</span></p>
-                    {/if}
-  
-                    {#if lift.notes !== ''}
-                      <p>Notes: <span style='color: rgb(120, 120, 120)'>{lift.notes}</span></p>
-                    {/if}
-  
-                    {#if lift.rir !== null}
-                      <p>RIR: <span style='color: rgb(120, 120, 120)'>{lift.rir}</span></p>
-                    {/if}
-                  </div>
+                <div class="numberContainer">
+                  <p>Lift id: {lift.id}</p>
+                  {#if lift.weight !== 0}
+                    <p>Weight: <span style='color: rgb(255, 89, 33)'>{lift.weight}</span></p>
+                  {/if}
 
-                  <div class="editButtonsContainer">
-                    <button class='editButton addSetButton' on:click={() => handleAdditionalSetClick(lift)}>+</button>
-                    <button class='editButton' on:click={() => handleEditClick(lift)}>
-                      <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                        <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
-                        <path d="M13.5 6.5l4 4" />
-                      </svg>
-                    </button>
-  
-                    <button class="editButton" on:click={() => handleDeleteClick(lift)}>
-                      X
-                    </button>
-                  </div>
+                  <p>Sets: <span style='color: rgb(255, 89, 33)'>{lift.sets}</span></p>
 
+                  {#if lift.reps === 0}
+                    <p><span style='color: rgb(255, 0, 0)'>Reps: {lift.reps}</span></p>
+                  {:else}
+                    <p>Reps: <span style='color: rgb(255, 89, 33)'>{lift.reps}</span></p>
+                  {/if}
+
+                  {#if lift.notes !== ''}
+                    <p>Notes: <span style='color: rgb(120, 120, 120)'>{lift.notes}</span></p>
+                  {/if}
+
+                  {#if lift.rir !== null}
+                    <p>RIR: <span style='color: rgb(120, 120, 120)'>{lift.rir}</span></p>
+                  {/if}
                 </div>
-              {/if}
-            {/each}
-          {/if}
+
+                <div class="editButtonsContainer">
+                  <button class='editButton addSetButton' on:click={() => handleAdditionalSetClick(lift)}>+</button>
+                  <button class='editButton' on:click={() => handleEditClick(lift)}>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-pencil" width="20" height="20" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                      <path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" />
+                      <path d="M13.5 6.5l4 4" />
+                    </svg>
+                  </button>
+
+                  <button class="editButton" on:click={() => handleDeleteClick(lift)}>
+                    X
+                  </button>
+                </div>
+
+              </div>
+            {/if}
+          {/each}
       </div>
     {/each}
   </div>

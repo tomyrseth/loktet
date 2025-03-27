@@ -12,7 +12,8 @@ export const load: PageServerLoad = async ({ url }) => {
 
   .from('lifts')
   .select()
-  .eq('day_id', day_id);
+  .eq('day_id', day_id)
+  .order('id', {ascending: true})
   return{
     data: data ?? [],
   };
