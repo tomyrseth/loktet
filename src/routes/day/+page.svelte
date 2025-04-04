@@ -171,7 +171,6 @@ onMount(() => {
               <div class='movement'>
 
                 <div class="numberContainer">
-                  <p>Lift id: {lift.id}</p>
                   {#if lift.weight !== 0}
                     <p>Weight: <span style='color: rgb(255, 89, 33)'>{lift.weight}</span></p>
                   {/if}
@@ -494,7 +493,7 @@ onMount(() => {
   .movement {
     display: flex;
     flex-direction: row;
-    min-width: 130px;
+    min-width: 140px;
     flex-wrap: wrap;
     text-wrap: wrap;
     margin: 0em 0em 0em 0em;
