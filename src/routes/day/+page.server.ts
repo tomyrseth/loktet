@@ -1,5 +1,5 @@
-import { supabase } from "$lib/supabaseClient";
-import { fail, type Actions } from "@sveltejs/kit";
+import { supabase } from '$lib/supabaseClient';
+import { fail, type Actions } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
 let uid;
@@ -10,18 +10,18 @@ export const load: PageServerLoad = async ({ url }) => {
 
   const { data, error } = await supabase
 
-  .from('lifts')
-  .select()
-  .eq('day_id', day_id)
-  .order('id', {ascending: true})
-  return{
+    .from('lifts')
+    .select()
+    .eq('day_id', day_id)
+    .order('id', { ascending: true });
+  return {
     data: data ?? [],
   };
 };
 
 export const actions: Actions = {
   lift: async ({ request }) => {
-    const formData = await request.formData()
+    const formData = await request.formData();
     let weight = formData.get('weight');
     const sets = formData.get('sets');
     const reps = formData.get('reps');
@@ -37,14 +37,20 @@ export const actions: Actions = {
       rir = null;
     }
 
-    const { data, error } = await supabase
-    .from('lifts')
-    .insert([
-      { day_id: day_id, exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes, rir: rir }
+    const { data, error } = await supabase.from('lifts').insert([
+      {
+        day_id: day_id,
+        exercise_id: ex_id,
+        sets: sets,
+        reps: reps,
+        weight: weight,
+        notes: notes,
+        rir: rir,
+      },
     ]);
 
     if (!error) {
-      return { success: true , data: data}
+      return { success: true, data: data };
     }
     throw new Error(error.message);
   },
@@ -53,15 +59,15 @@ export const actions: Actions = {
     const formData = await request.formData();
 
     const bw = formData.get('bw');
-    
+
     const today = formData.get('today');
 
     const { data, error } = await supabase
-    .from('bodyweight')
-    .insert({ uid: uid, created_at: today, bodyweight: bw });
+      .from('bodyweight')
+      .insert({ uid: uid, created_at: today, bodyweight: bw });
 
     if (!error) {
-      return { success: true , data: data}
+      return { success: true, data: data };
     }
     throw new Error(error.message);
   },
@@ -75,24 +81,30 @@ export const actions: Actions = {
     const fats = formData.get('fats');
     const today = formData.get('today');
 
-    const { data, error } = await supabase
-    .from('calories')
-    .insert([
-      { uid: uid, calories: calories, created_at: today, protein: protein, carbs: carbs, fats: fats}
+    const { data, error } = await supabase.from('calories').insert([
+      {
+        uid: uid,
+        calories: calories,
+        created_at: today,
+        protein: protein,
+        carbs: carbs,
+        fats: fats,
+      },
     ]);
 
     if (!error) {
-      return { success: true , data: data}
+      return { success: true, data: data };
     }
     throw new Error(error.message);
   },
 
   editLift: async ({ request }) => {
-    const formData = await request.formData()
+    const formData = await request.formData();
     let weight = formData.get('weight');
     const liftID = formData.get('id');
     const sets = formData.get('sets');
     const reps = formData.get('reps');
+    const rir = formData.get('rir');
     const notes = formData.get('notes');
     const ex_id = formData.get('ex_id');
     console.log('backend edit', formData);
@@ -102,33 +114,36 @@ export const actions: Actions = {
     }
 
     const { data, error } = await supabase
-    .from('lifts')
-    .update({exercise_id: ex_id, sets: sets, reps: reps, weight: weight, notes: notes})
-    .eq('id', liftID);
+      .from('lifts')
+      .update({
+        exercise_id: ex_id,
+        sets: sets,
+        reps: reps,
+        weight: weight,
+        rir: rir,
+        notes: notes,
+      })
+      .eq('id', liftID);
 
     if (!error) {
-      return { success: true , data: data}
+      return { success: true, data: data };
     }
     throw new Error(error.message);
   },
 
   deleteLift: async ({ request }) => {
-    const formData = await request.formData()
+    const formData = await request.formData();
     const liftID = formData.get('id');
     console.log('backend delete', formData);
 
     const { data, error } = await supabase
-    .from('lifts')
-    .delete()
-    .eq('id', liftID);
+      .from('lifts')
+      .delete()
+      .eq('id', liftID);
 
     if (!error) {
-      return { success: true , data: data}
+      return { success: true, data: data };
     }
     throw new Error(error.message);
-  }
-
-
-
-
-}
+  },
+};
