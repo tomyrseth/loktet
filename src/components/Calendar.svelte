@@ -81,9 +81,15 @@
 
     if (dietPlanArr){
       // Sort objects by id in descending order
-      dietPlanArr.sort((a, b) => b.id - a.id);
+      dietPlanArr.sort((a, b) => {
+        if (new Date(a.created_at) > new Date(b.created_at)) return -1;
+        return 1;
+      });
+      console.log("🚀 ~ dietPlanArr.sort ~ dietPlanArr:", dietPlanArr)
       // Find the first upcoming date
       const result = dietPlanArr.find(item => new Date(item.created_at) < new Date(date));
+      console.log('yolo', dietPlanArr, new Date(date), new Date(dietPlanArr[0].created_at));
+      
       // Handle the case where no future date is found
       if (result){
         type = result.type;
