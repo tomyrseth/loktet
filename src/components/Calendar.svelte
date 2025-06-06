@@ -80,7 +80,7 @@
     }
 
     if (dietPlanArr){
-      // Sort objects by id in descending order
+      // Array.sort method, return -1 for a before b, +1 for b before a.
       dietPlanArr.sort((a, b) => {
         if (new Date(a.created_at) > new Date(b.created_at)) return -1;
         return 1;

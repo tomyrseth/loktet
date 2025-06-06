@@ -104,13 +104,16 @@ export const actions: Actions = {
     const liftID = formData.get('id');
     const sets = formData.get('sets');
     const reps = formData.get('reps');
-    const rir = formData.get('rir');
+    let rir = formData.get('rir');
     const notes = formData.get('notes');
     const ex_id = formData.get('ex_id');
     console.log('backend edit', formData);
 
     if (!weight) {
       weight = 0;
+    }
+    if (!rir) {
+      rir = null;
     }
 
     const { data, error } = await supabase
