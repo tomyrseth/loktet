@@ -36,6 +36,7 @@ export const actions: Actions = {
     if (!rir) {
       rir = null;
     }
+    console.log('BACKEND: ', ex_id);
 
     const { data, error } = await supabase.from('lifts').insert([
       {

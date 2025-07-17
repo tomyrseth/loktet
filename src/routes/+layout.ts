@@ -1,10 +1,10 @@
-import { supabase } from "$lib/supabaseClient";
+import { supabase } from '$lib/supabaseClient';
 
 export async function load({ fetch, params }) {
   const exerciseRes = await supabase
-  .from('exercises')
-  .select('*')
-  .order('name', {ascending: true})
+    .from('exercises')
+    .select('*')
+    .order('name', { ascending: true });
 
   const exercisesErr = exerciseRes.error;
 
@@ -12,8 +12,20 @@ export async function load({ fetch, params }) {
     return {
       status: 500,
       body: {
-        error: `Error: ${exercisesErr.message}`
-      }
+        error: `Error: ${exercisesErr.message}`,
+      },
+    };
+  }
+
+  const typesRes = await supabase.from('types').select('*');
+  const typesErr = typesRes.error;
+
+  if (typesErr) {
+    return {
+      status: 500,
+      body: {
+        error: `Error: ${typesErr.message}`,
+      },
     };
   }
 
@@ -24,50 +36,44 @@ export async function load({ fetch, params }) {
     return {
       status: 500,
       body: {
-        error: `Error: ${daysErr.message}`
-      }
+        error: `Error: ${daysErr.message}`,
+      },
     };
   }
 
-  const usersRes = await supabase
-  .from('users')
-  .select('');
+  const usersRes = await supabase.from('users').select('');
   const usersErr = usersRes.error;
 
   if (usersErr) {
     return {
       status: 500,
       body: {
-        error: `Error: ${usersErr.message}`
-      }
+        error: `Error: ${usersErr.message}`,
+      },
     };
   }
 
-  const bwRes = await supabase
-  .from('bodyweight')
-  .select('');
+  const bwRes = await supabase.from('bodyweight').select('');
   const bwResErr = bwRes.error;
 
   if (bwResErr) {
     return {
       status: 500,
       body: {
-        error: `Error: ${bwResErr.message}`
-      }
+        error: `Error: ${bwResErr.message}`,
+      },
     };
   }
 
-  const caloriesRes = await supabase
-  .from('calories')
-  .select('');
+  const caloriesRes = await supabase.from('calories').select('');
   const caloriesResErr = caloriesRes.error;
 
   if (caloriesResErr) {
     return {
       status: 500,
       body: {
-        error: `Error: ${caloriesResErr.message}`
-      }
+        error: `Error: ${caloriesResErr.message}`,
+      },
     };
   }
 
@@ -78,14 +84,18 @@ export async function load({ fetch, params }) {
     return {
       status: 500,
       body: {
-        error: `Error: ${dietPlanErr.message}`
-      }
+        error: `Error: ${dietPlanErr.message}`,
+      },
     };
   }
 
   return {
-    exerciseRes, daysRes, usersRes, bwRes, caloriesRes, dietPlanRes
+    exerciseRes,
+    typesRes,
+    daysRes,
+    usersRes,
+    bwRes,
+    caloriesRes,
+    dietPlanRes,
   };
 }
-
-

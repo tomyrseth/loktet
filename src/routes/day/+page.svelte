@@ -36,12 +36,14 @@ onMount(() => {
 
   let liftsData = data.data;
   let exerciseData = data.exerciseRes?.data;
+  let typesData = data.typesRes?.data;
   let daysData = data.daysRes?.data;
   let bwData = data.bwRes?.data;
   let caloriesData = data.caloriesRes?.data;
 
   let liftShow = false, bwShow = false, caloriesShow = false, editShow = false;
   let exerciseSelect :string;
+  let typeSelect: string;
   let protein = 0, carbs = 0, fats = 0, sets = 0, reps = 0, weight = 0, bodyweight = 0, calories = 0;
   let user_name = '';
   let exercise_id_list = [], arr = [];
@@ -51,11 +53,22 @@ onMount(() => {
 
   let today = currentDay.created_at;
 
-  let exercise_id: number
+  let exercise_id: number;
+  let type_id = 1;
+  let filteredExerciseData: typeof exerciseData;
+  filteredExerciseData = exerciseData?.filter((ex) => ex.type === type_id);
 
   $: if (exerciseSelect){
-    let ex_obj = exerciseData.find(o => o.name === exerciseSelect);
+    let ex_obj = filteredExerciseData.find(o => o.name === exerciseSelect);
     exercise_id = ex_obj.id;
+    console.log("🚀 ~ exercise_id:", exercise_id)
+    
+  }
+
+  $: if (typeSelect) {
+    let type_obj = typesData?.find(o => o.type === typeSelect);
+    filteredExerciseData = exerciseData?.filter((ex) => ex.type === type_obj.id);
+    exerciseSelect = filteredExerciseData[0].name;
   }
 
   liftsData.forEach(element =>{
@@ -67,6 +80,12 @@ onMount(() => {
   function findExName (id:number){
     let ex_name = exerciseData.find(o => o.id === id);
     return ex_name.name;
+  }
+
+  function findExTypeName (id:number) {
+    let ex = exerciseData.find(o => o.id === id);
+    let type = typesData?.find(o => o.id === ex.type);
+    return type.type;
   }
 
   //For edit and delete functions
@@ -123,6 +142,7 @@ onMount(() => {
             console.log(`Sorry, we are out of ${user_id}.`);
   }
 
+  console.log(typesData, 'yolo');
 </script>
 
 <div class='main'>
@@ -165,7 +185,10 @@ onMount(() => {
     {#each exercise_id_list as ex}
       <div class="inner-movement-container">
         
-        <h2 class='ex-name'>{findExName(ex)}</h2>
+        <div class="exercise-info">
+          <h2 class='ex-name'>{findExName(ex)}</h2>
+          <h2 class='ex-type'>{findExTypeName(ex)}</h2>
+        </div>
           {#each liftsData as lift}
             {#if lift.exercise_id === ex}
               <div class='movement'>
@@ -232,10 +255,18 @@ onMount(() => {
           };
         }}>
           <h1>Lift log</h1>
+          <label for='type'>type: </label>
+          <select bind:value={typeSelect} name='type'>
+            {#each typesData as type}
+              <option >{type.type}</option>
+            {/each}
+          </select>
+
+
           <label for='exercise'>Exercise: </label>
           <select bind:value={exerciseSelect} name='exercise'>
-            {#each exerciseData as exercise}
-              <option >{exercise.name}</option>
+            {#each filteredExerciseData as exercise}
+                <option>{exercise.name}</option>
             {/each}
           </select>
           <option value={exerciseData}></option>
@@ -511,6 +542,16 @@ onMount(() => {
     font-weight: bold;
     display: flex;
     color: rgb(255, 89, 33);
+    width: 150px;
+    padding: 5px 0px 0px 5px;
+    margin: 0px 0px px 0px;
+    border-radius: 0px;
+    border-right: solid rgba(255, 255, 255, 0.455) 2px;
+  }
+  .ex-type {
+    font-weight: bold;
+    display: flex;
+    color: rgb(195, 195, 195);
     width: 150px;
     padding: 5px 0px 0px 5px;
     margin: 0px 0px px 0px;
