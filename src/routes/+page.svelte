@@ -9,11 +9,9 @@
 </svelte:head>
 
 <section>
-	<div class="backdrop">
-		<h1>
-			loktet
-		</h1>
-	</div>
+	<h1>
+		loktet
+	</h1>
 </section>
 
 <style>
@@ -25,15 +23,6 @@
 		flex: 0.6;
 	}
 
-	.backdrop {
-		display: flex;
-		width: 100vw;
-		height: 40em;
-		margin: 0;
-		border: none;
-		border-radius: 0%;
-	}
-
 	h1 {
 		font-size: 12rem;
 		font-kerning: auto;
@@ -42,6 +31,8 @@
 		font-weight: bold;
 		width: 100%;
 		color:rgb(255, 89, 33);
+		border-bottom: solid 4px rgba(255, 88, 33, 0.513);
+		border-radius: 3%;
 	}
 
 	p {
