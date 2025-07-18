@@ -10,7 +10,7 @@
 
 <section>
 	<h1>
-		progressive web app
+		loktet
 	</h1>
 </section>
 
@@ -24,6 +24,8 @@
 	}
 
 	h1 {
+		font-size: 12rem;
+		font-weight: bold;
 		width: 100%;
 		color:rgb(255, 89, 33);
 	}

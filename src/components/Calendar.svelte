@@ -85,10 +85,8 @@
         if (new Date(a.created_at) > new Date(b.created_at)) return -1;
         return 1;
       });
-      console.log("🚀 ~ dietPlanArr.sort ~ dietPlanArr:", dietPlanArr)
       // Find the first upcoming date
       const result = dietPlanArr.find(item => new Date(item.created_at) < new Date(date));
-      console.log('yolo', dietPlanArr, new Date(date), new Date(dietPlanArr[0].created_at));
       
       // Handle the case where no future date is found
       if (result){
@@ -166,6 +164,8 @@
     //get all the dates from caloriesData(supabase) that match the 7 days
     const filteredUID = caloriesData.filter(item => item.uid === uid);
     const matchingDates = filteredUID.filter(item => weekFormatted.includes(item.created_at)); //Coercion
+    
+    // New muscle group weekly volume testing
 
     //Length check
     daysCompleted = matchingDates.length;

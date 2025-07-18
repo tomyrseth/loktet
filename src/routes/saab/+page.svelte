@@ -9,8 +9,6 @@
 	let dialog;
 	let plan = ['Cutting', 'Bulking', 'Maintenance']
 
-	console.log('hey', data);
-
 	const daysData = data.daysRes.data;
 	const bwData = data.bwRes.data;
 	const caloriesData = data.caloriesRes.data;

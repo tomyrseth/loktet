@@ -29,6 +29,18 @@ export async function load({ fetch, params }) {
     };
   }
 
+  const muscleGroupsRes = await supabase.from('muscle_groups').select('*');
+  const muscleGroupsErr = muscleGroupsRes.error;
+
+  if (muscleGroupsErr) {
+    return {
+      status: 500,
+      body: {
+        error: `Error: ${muscleGroupsErr.message}`,
+      },
+    };
+  }
+
   const daysRes = await supabase.from('days').select();
   const daysErr = daysRes.error;
 
@@ -92,6 +104,7 @@ export async function load({ fetch, params }) {
   return {
     exerciseRes,
     typesRes,
+    muscleGroupsRes,
     daysRes,
     usersRes,
     bwRes,

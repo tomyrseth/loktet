@@ -9,7 +9,7 @@
   import { onMount } from 'svelte';
 
 onMount(() => {
-  console.log('liftsData ',liftsData);
+  //console.log('liftsData ',liftsData);
 });
 
   type lifts = {
@@ -37,6 +37,7 @@ onMount(() => {
   let liftsData = data.data;
   let exerciseData = data.exerciseRes?.data;
   let typesData = data.typesRes?.data;
+  let muscleGroupsData = data.muscleGroupsRes?.data;
   let daysData = data.daysRes?.data;
   let bwData = data.bwRes?.data;
   let caloriesData = data.caloriesRes?.data;
@@ -59,16 +60,24 @@ onMount(() => {
   filteredExerciseData = exerciseData?.filter((ex) => ex.type === type_id);
 
   $: if (exerciseSelect){
+    console.log("🚀 ~ exerciseSelect:", exerciseSelect)
+    
     let ex_obj = filteredExerciseData.find(o => o.name === exerciseSelect);
+    if (!ex_obj) {
+      exerciseSelect = filteredExerciseData[0].name;
+      ex_obj = filteredExerciseData.find(o => o.name === exerciseSelect);
+    } 
     exercise_id = ex_obj.id;
     console.log("🚀 ~ exercise_id:", exercise_id)
-    
   }
 
   $: if (typeSelect) {
+    
     let type_obj = typesData?.find(o => o.type === typeSelect);
     filteredExerciseData = exerciseData?.filter((ex) => ex.type === type_obj.id);
-    exerciseSelect = filteredExerciseData[0].name;
+    //exerciseSelect = filteredExerciseData[0].name;
+    
+    
   }
 
   liftsData.forEach(element =>{
@@ -86,6 +95,26 @@ onMount(() => {
     let ex = exerciseData.find(o => o.id === id);
     let type = typesData?.find(o => o.id === ex.type);
     return type.type;
+  }
+
+  function findExMainGroup(id:number) {
+    let ex = exerciseData.find(o => o.id === id);
+    let muscleGroup = muscleGroupsData?.find(mgroup => mgroup.id === ex.primary_muscle_group);
+    return muscleGroup.name;
+  }
+  function findExOtherGroup(id:number) {
+    let ex = exerciseData.find(o => o.id === id);
+    console.log("🚀 ~ findExOtherGroup ~ ex:", ex)
+    if (!ex.other_muscle_groups) {
+      console.log("🚀 ~ findExOtherGroup ~ NOT TRUE")
+      return '';
+    }
+    let words = '';
+    ex.other_muscle_groups.forEach(el => {
+      words += el +', ';
+    });
+    //let muscleGroup = muscleGroupsData?.find(mgroup => mgroup.name === ex.other_muscle_group);
+    return words;
   }
 
   //For edit and delete functions
@@ -142,7 +171,6 @@ onMount(() => {
             console.log(`Sorry, we are out of ${user_id}.`);
   }
 
-  console.log(typesData, 'yolo');
 </script>
 
 <div class='main'>
@@ -188,6 +216,8 @@ onMount(() => {
         <div class="exercise-info">
           <h2 class='ex-name'>{findExName(ex)}</h2>
           <h2 class='ex-type'>{findExTypeName(ex)}</h2>
+          <h2 class='ex-mgroup'>{findExMainGroup(ex)}</h2>
+          <h2 class='ex-ogroup'>{findExOtherGroup(ex)}</h2>
         </div>
           {#each liftsData as lift}
             {#if lift.exercise_id === ex}
@@ -255,10 +285,11 @@ onMount(() => {
           };
         }}>
           <h1>Lift log</h1>
+
           <label for='type'>type: </label>
           <select bind:value={typeSelect} name='type'>
             {#each typesData as type}
-              <option >{type.type}</option>
+              <option value={type.type}>{type.type}</option>
             {/each}
           </select>
 
@@ -266,9 +297,10 @@ onMount(() => {
           <label for='exercise'>Exercise: </label>
           <select bind:value={exerciseSelect} name='exercise'>
             {#each filteredExerciseData as exercise}
-                <option>{exercise.name}</option>
+                <option value={exercise.name}>{exercise.name}</option>
             {/each}
           </select>
+
           <option value={exerciseData}></option>
           {#if form?.missing}
             <p>This field is required</p>
@@ -377,24 +409,6 @@ onMount(() => {
         }}>
           <h1>Lift log (editing)</h1>
 
-          {#if !changeExercise}
-            <button type='button' class="changeExercise" on:click={() => (changeExercise = !changeExercise)}>
-              Change exercise
-            </button>
-          {/if}
-
-          {#if changeExercise}
-            <label for='exercise'>Exercise: </label>
-            <select bind:value={exerciseSelect} name='exercise'>
-              {#each exerciseData as exercise}
-                <option>{exercise.name}</option>
-              {/each}
-            </select>
-            <input type='hidden' name='ex_id' value={exercise_id} />
-            {#if form?.missing}
-              <p>This field is required</p>
-            {/if}
-          {/if}
 
           <label for='weight'>Weight: </label>
           <input type='number' step='0.1' name='weight' value={clickedEditLift.weight}>
@@ -551,7 +565,29 @@ onMount(() => {
   .ex-type {
     font-weight: bold;
     display: flex;
-    color: rgb(195, 195, 195);
+    color: rgba(255, 88, 33, 0.502);
+    width: 150px;
+    padding: 5px 0px 0px 5px;
+    margin: 0px 0px px 0px;
+    border-radius: 0px;
+    border-right: solid rgba(255, 255, 255, 0.455) 2px;
+  }
+
+  .ex-mgroup {
+    font-weight: bold;
+    display: flex;
+    color: rgba(195, 195, 195, 0.61);
+    width: 150px;
+    padding: 5px 0px 0px 5px;
+    margin: 0px 0px px 0px;
+    border-radius: 0px;
+    border-right: solid rgba(255, 255, 255, 0.358) 2px;
+  }
+
+  .ex-ogroup {
+    font-weight: bold;
+    display: flex;
+    color: rgba(195, 195, 195, 0.623);
     width: 150px;
     padding: 5px 0px 0px 5px;
     margin: 0px 0px px 0px;
