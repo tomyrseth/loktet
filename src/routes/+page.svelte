@@ -4,14 +4,16 @@
 </script>
 
 <svelte:head>
-	<title>Home</title>
+	<title>loktet</title>
 	<meta name="description" content="Svelte demo app" />
 </svelte:head>
 
 <section>
-	<h1>
-		loktet
-	</h1>
+	<div class="backdrop">
+		<h1>
+			loktet
+		</h1>
+	</div>
 </section>
 
 <style>
@@ -23,8 +25,20 @@
 		flex: 0.6;
 	}
 
+	.backdrop {
+		display: flex;
+		width: 100vw;
+		height: 40em;
+		margin: 0;
+		border: none;
+		border-radius: 0%;
+	}
+
 	h1 {
 		font-size: 12rem;
+		font-kerning: auto;
+		text-shadow: 7px 7px 1px rgba(0, 0, 0, 0.9);
+		letter-spacing: 3px;
 		font-weight: bold;
 		width: 100%;
 		color:rgb(255, 89, 33);

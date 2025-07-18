@@ -17,7 +17,10 @@ export async function load({ fetch, params }) {
     };
   }
 
-  const typesRes = await supabase.from('types').select('*');
+  const typesRes = await supabase
+    .from('types')
+    .select('*')
+    .order('type', { ascending: true });
   const typesErr = typesRes.error;
 
   if (typesErr) {
