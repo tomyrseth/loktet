@@ -26,7 +26,7 @@
 	h1 {
 		font-size: 12rem;
 		font-kerning: auto;
-		text-shadow: 7px 7px 1px rgba(0, 0, 0, 0.9);
+		text-shadow: 7px 7px 3px rgba(0, 0, 0, 0.6);
 		letter-spacing: 3px;
 		font-weight: bold;
 		width: 100%;
