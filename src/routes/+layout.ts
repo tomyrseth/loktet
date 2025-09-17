@@ -44,7 +44,7 @@ export async function load({ fetch, params }) {
     };
   }
 
-  const daysRes = await supabase.from('days').select();
+  const daysRes = await supabase.from('days').select('*').gte('id', 700);
   const daysErr = daysRes.error;
 
   if (daysErr) {
